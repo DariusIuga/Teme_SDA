@@ -20,8 +20,15 @@ typedef struct
 
 void initList(doublyLinkedList *);
 void addNode(doublyLinkedList *, char);
-void show(doublyLinkedList*);
-void showCurrent(doublyLinkedList*);
+void show(doublyLinkedList *);
+void showCurrent(doublyLinkedList *);
+void moveLeft(doublyLinkedList *);
+void moveRight(doublyLinkedList *);
+void moveLeftChar(doublyLinkedList *, char);
+void moveRightChar(doublyLinkedList *, char);
+void writeChar(doublyLinkedList *, char);
+void insertLeftChar(doublyLinkedList *, char);
+void insertRightChar(doublyLinkedList *, char);
 
 int main(void)
 {
@@ -29,12 +36,30 @@ int main(void)
     initList(&band);
     addNode(&band, '#');
 
+    // *** TESTE ***
+
     printf("banda initial: ");
     show(&band);
     printf("banda: ");
-    showCurrent(&band);
-    printf("banda: ");
+    moveRight(&band);
     show(&band);
+    printf("banda: ");
+    writeChar(&band, 'X');
+    show(&band);
+    printf("banda: ");
+    moveRight(&band);
+    show(&band);
+    printf("banda: ");
+    writeChar(&band, 'Y');
+    show(&band);
+    printf("banda: ");
+    moveLeft(&band);
+    show(&band);
+    printf("banda: ");
+    moveRight(&band);
+    show(&band);
+
+    // *** TESTE ***
 
     return 0;
 }
@@ -73,7 +98,7 @@ void show(doublyLinkedList *band)
         {
             printf("%c", current->data);
         }
-        current=current->next;
+        current = current->next;
     }
     printf("\n");
 }
@@ -81,4 +106,110 @@ void show(doublyLinkedList *band)
 void showCurrent(doublyLinkedList *band)
 {
     printf("%c\n", band->finger->data);
+}
+
+void moveLeft(doublyLinkedList *band)
+{
+    if (band->finger != band->head)
+    {
+        band->finger = band->finger->prev;
+    }
+}
+
+void moveRight(doublyLinkedList *band)
+{
+    if (band->finger == band->tail)
+    {
+        node *newNode = (node *)malloc(sizeof(node));
+        newNode->data = '#';
+        band->tail->next = newNode;
+        newNode->prev = band->tail;
+        band->tail = newNode;
+        band->tail->next = NULL;
+        band->finger = band->tail;
+    }
+    else
+    {
+        band->finger = band->finger->next;
+    }
+}
+
+void moveLeftChar(doublyLinkedList *band, char elem)
+{
+    node *current = band->finger;
+    int gasit = 0;
+    while (current != band->head)
+    {
+        if (current->data == elem)
+        {
+            band->finger = current;
+            gasit = 1;
+            break;
+        }
+        current = current->prev;
+    }
+    if (!gasit)
+    {
+        printf("ERROR\n");
+    }
+}
+
+void moveRightChar(doublyLinkedList *band, char elem)
+{
+    node *current = band->finger;
+    while (current != band->tail)
+    {
+        if (current->data == elem)
+        {
+            band->finger = current;
+            break;
+        }
+        current = current->prev;
+    }
+    if (current->data != elem)
+    {
+        node *newNode = (node *)malloc(sizeof(node));
+        band->tail->next = newNode;
+        newNode->prev = band->tail;
+        band->tail = newNode;
+        band->tail->next = NULL;
+        band->finger = band->tail;
+    }
+}
+
+void writeChar(doublyLinkedList *band, char elem)
+{
+    band->finger->data = elem;
+}
+
+void insertLeftChar(doublyLinkedList *band, char elem)
+{
+    if (band->finger != band->head->next)
+    {
+        band->finger = band->finger->prev;
+        band->finger->data = elem;
+    }
+    else
+    {
+        printf("ERROR\n");
+    }
+}
+
+void insertRightChar(doublyLinkedList *band, char elem)
+{
+    if (band->finger == band->tail)
+    {
+        node *newNode = (node *)malloc(sizeof(node));
+        newNode->data = elem;
+        band->tail->next = newNode;
+        newNode->prev = band->tail;
+        band->tail = newNode;
+        band->tail->next = NULL;
+        band->finger = band->tail;
+    }
+    else
+    {
+        band->finger = band->finger->next;
+        band->finger->data = elem;
+    }
 }
