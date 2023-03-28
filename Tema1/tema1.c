@@ -1,40 +1,95 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include "queue.h"
+#include "list.h"
 
-typedef char T;
-typedef struct node node;
-
-struct node
-{
-    T data;
-    node *prev;
-    node *next;
-};
-
-typedef struct
-{
-    node *head;
-    node *tail;
-    node *finger;
-} doublyLinkedList;
-
-void initList(doublyLinkedList *);
-void addNode(doublyLinkedList *, char);
-void show(doublyLinkedList *);
-void showCurrent(doublyLinkedList *);
-void moveLeft(doublyLinkedList *);
-void moveRight(doublyLinkedList *);
-void moveLeftChar(doublyLinkedList *, char);
-void moveRightChar(doublyLinkedList *, char);
-void writeChar(doublyLinkedList *, char);
-void insertLeftChar(doublyLinkedList *, char);
-void insertRightChar(doublyLinkedList *, char);
+#define BUF_LENGTH 100
 
 int main(void)
 {
     doublyLinkedList band;
+    FILE *input;
+    char line[BUF_LENGTH], *token;
+    int i, nrLinii;
+
     initList(&band);
     addNode(&band, '#');
+
+    input = fopen("tema1.in", "r");
+    if (input == NULL)
+    {
+        printf("Eroare la deschiderea fisierului tema1.in!\n");
+        return 1;
+    }
+
+    fscanf(input, "%d", &nrLinii);
+    fgetc(input);
+    for (i = 0; i < nrLinii; i++)
+    {
+        fgets(line, BUF_LENGTH, input);
+        printf("%s", line);
+        token = strtok(line, " \n");
+        if (strcmp(token, "MOVE_LEFT") == 0)
+        {
+            printf("Instructiunea MOVE_LEFT\n");
+        }
+        else if (strcmp(token, "MOVE_RIGHT") == 0)
+        {
+            printf("Instructiunea MOVE_RIGHT\n");
+        }
+        else if (strcmp(token, "MOVE_LEFT_CHAR") == 0)
+        {
+            printf("Instructiunea MOVE_LEFT_CHAR\n");
+            printf("Caracterul e %s\n", token);
+        }
+        else if (strcmp(token, "MOVE_RIGHT_CHAR") == 0)
+        {
+            printf("Instructiunea MOVE_LEFT\n");
+            token = strtok(NULL, " \n");
+            printf("Caracterul e %s\n", token);
+        }
+        else if (strcmp(token, "WRITE") == 0)
+        {
+            printf("Instructiunea WRITE\n");
+            token = strtok(NULL, " \n");
+            printf("Caracterul e %s\n", token);
+        }
+        else if (strcmp(token, "INSERT_LEFT") == 0)
+        {
+            printf("Instructiunea INSERT_LEFT\n");
+            token = strtok(NULL, " \n");
+            printf("Caracterul e %s\n", token);
+        }
+        else if (strcmp(token, "INSERT_RIGHT") == 0)
+        {
+            printf("Instructiunea INSERT_RIGHT\n");
+            token = strtok(NULL, " \n");
+            printf("Caracterul e %s\n", token);
+        }
+        else if (strcmp(token, "SHOW_CURRENT") == 0)
+        {
+            printf("Instructiunea SHOW_CURRENT\n");
+            token = strtok(NULL, " \n");
+            printf("Caracterul e %s\n", token);
+        }
+        else if (strcmp(token, "SHOW") == 0)
+        {
+            printf("Instructiunea SHOW\n");
+        }
+        else if (strcmp(token, "UNDO") == 0)
+        {
+            printf("Instructiunea UNDO\n");
+        }
+        else if (strcmp(token, "REDO") == 0)
+        {
+            printf("Instructiunea REDO\n");
+        }
+        else if (strcmp(token, "EXECUTE") == 0)
+        {
+            printf("Instructiunea EXECUTE\n");
+        }
+    }
 
     // *** TESTE ***
 
@@ -64,152 +119,3 @@ int main(void)
     return 0;
 }
 
-void initList(doublyLinkedList *band)
-{
-    node *sentinel = (node *)malloc(sizeof(node));
-    sentinel->prev = NULL;
-    sentinel->next = NULL;
-    band->head = sentinel;
-    band->tail = sentinel;
-    band->finger = sentinel;
-}
-
-void addNode(doublyLinkedList *band, char elem)
-{
-    node *newNode = (node *)malloc(sizeof(node));
-    newNode->data = elem;
-    band->head->next = newNode;
-    band->tail = newNode;
-    band->finger = newNode;
-    newNode->prev = band->head;
-    newNode->next = NULL;
-}
-
-void show(doublyLinkedList *band)
-{
-    node *current = band->head->next;
-    while (current != NULL)
-    {
-        if (current == band->finger)
-        {
-            printf("|%c|", current->data);
-        }
-        else
-        {
-            printf("%c", current->data);
-        }
-        current = current->next;
-    }
-    printf("\n");
-}
-
-void showCurrent(doublyLinkedList *band)
-{
-    printf("%c\n", band->finger->data);
-}
-
-void moveLeft(doublyLinkedList *band)
-{
-    if (band->finger != band->head)
-    {
-        band->finger = band->finger->prev;
-    }
-}
-
-void moveRight(doublyLinkedList *band)
-{
-    if (band->finger == band->tail)
-    {
-        node *newNode = (node *)malloc(sizeof(node));
-        newNode->data = '#';
-        band->tail->next = newNode;
-        newNode->prev = band->tail;
-        band->tail = newNode;
-        band->tail->next = NULL;
-        band->finger = band->tail;
-    }
-    else
-    {
-        band->finger = band->finger->next;
-    }
-}
-
-void moveLeftChar(doublyLinkedList *band, char elem)
-{
-    node *current = band->finger;
-    int gasit = 0;
-    while (current != band->head)
-    {
-        if (current->data == elem)
-        {
-            band->finger = current;
-            gasit = 1;
-            break;
-        }
-        current = current->prev;
-    }
-    if (!gasit)
-    {
-        printf("ERROR\n");
-    }
-}
-
-void moveRightChar(doublyLinkedList *band, char elem)
-{
-    node *current = band->finger;
-    while (current != band->tail)
-    {
-        if (current->data == elem)
-        {
-            band->finger = current;
-            break;
-        }
-        current = current->prev;
-    }
-    if (current->data != elem)
-    {
-        node *newNode = (node *)malloc(sizeof(node));
-        band->tail->next = newNode;
-        newNode->prev = band->tail;
-        band->tail = newNode;
-        band->tail->next = NULL;
-        band->finger = band->tail;
-    }
-}
-
-void writeChar(doublyLinkedList *band, char elem)
-{
-    band->finger->data = elem;
-}
-
-void insertLeftChar(doublyLinkedList *band, char elem)
-{
-    if (band->finger != band->head->next)
-    {
-        band->finger = band->finger->prev;
-        band->finger->data = elem;
-    }
-    else
-    {
-        printf("ERROR\n");
-    }
-}
-
-void insertRightChar(doublyLinkedList *band, char elem)
-{
-    if (band->finger == band->tail)
-    {
-        node *newNode = (node *)malloc(sizeof(node));
-        newNode->data = elem;
-        band->tail->next = newNode;
-        newNode->prev = band->tail;
-        band->tail = newNode;
-        band->tail->next = NULL;
-        band->finger = band->tail;
-    }
-    else
-    {
-        band->finger = band->finger->next;
-        band->finger->data = elem;
-    }
-}
