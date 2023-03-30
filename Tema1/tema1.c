@@ -3,19 +3,24 @@
 #include <string.h>
 #include "queue.h"
 #include "list.h"
+#include "stack.h"
 
-#define BUF_LENGTH 100
+#define BUF_LENGTH 19
 
 int main(void)
 {
     doublyLinkedList band;
+    instructionQueue queue;
+    stack stack;
     FILE *input;
-    char line[BUF_LENGTH], *token;
-    int i, nrLinii;
+    char line[BUF_LENGTH], *token, operation, operand;
+    unsigned short i, nrLinii;
+    parameters instruction;
 
     initList(&band);
-    addNode(&band, '#');
-
+    moveRight(&band);
+    initQueue(&queue);
+    initStack(&stack);
     input = fopen("tema1.in", "r");
     if (input == NULL)
     {
@@ -23,99 +28,143 @@ int main(void)
         return 1;
     }
 
-    fscanf(input, "%d", &nrLinii);
+    fscanf(input, "%hu", &nrLinii);
     fgetc(input);
     for (i = 0; i < nrLinii; i++)
     {
         fgets(line, BUF_LENGTH, input);
-        printf("%s", line);
+        printf("%s\n", line);
         token = strtok(line, " \n");
+
+        /*  Asocieri operatii de tip update - cod
+
+        MOVE_LEFT == '1'
+        MOVE_RIGHT == '2'
+        MOVE_LEFT_CHAR == '3'
+        MOVE_RIGHT_CHAR == '4'
+        WRITE == '5'
+        INSERT_LEFT == '6'
+        INSERT_RIGHT == '7'
+
+            Asocieri pentru stivele UNDO/REDO
+
+        MOVE_LEFT='l'
+        MOVE_RIGHT='r'
+
+        */
         if (strcmp(token, "MOVE_LEFT") == 0)
         {
-            printf("Instructiunea MOVE_LEFT\n");
+            enqueue(&queue, '1', '\0');
+            push(&stack, 'l');
         }
         else if (strcmp(token, "MOVE_RIGHT") == 0)
         {
-            printf("Instructiunea MOVE_RIGHT\n");
+            enqueue(&queue, '2', '\0');
+            push(&stack, 'r');
         }
         else if (strcmp(token, "MOVE_LEFT_CHAR") == 0)
         {
-            printf("Instructiunea MOVE_LEFT_CHAR\n");
-            printf("Caracterul e %s\n", token);
+            token = strtok(NULL, " \n");
+            operand = token[0];
+            enqueue(&queue, '3', operand);
         }
         else if (strcmp(token, "MOVE_RIGHT_CHAR") == 0)
         {
-            printf("Instructiunea MOVE_LEFT\n");
             token = strtok(NULL, " \n");
-            printf("Caracterul e %s\n", token);
+            operand = token[0];
+            enqueue(&queue, '4', operand);
         }
         else if (strcmp(token, "WRITE") == 0)
         {
-            printf("Instructiunea WRITE\n");
             token = strtok(NULL, " \n");
-            printf("Caracterul e %s\n", token);
+            operand = token[0];
+            enqueue(&queue, '5', operand);
+            flush(&stack);
         }
         else if (strcmp(token, "INSERT_LEFT") == 0)
         {
-            printf("Instructiunea INSERT_LEFT\n");
             token = strtok(NULL, " \n");
-            printf("Caracterul e %s\n", token);
+            operand = token[0];
+            enqueue(&queue, '6', operand);
         }
         else if (strcmp(token, "INSERT_RIGHT") == 0)
         {
-            printf("Instructiunea INSERT_RIGHT\n");
             token = strtok(NULL, " \n");
-            printf("Caracterul e %s\n", token);
+            operand = token[0];
+            enqueue(&queue, '7', operand);
         }
         else if (strcmp(token, "SHOW_CURRENT") == 0)
         {
-            printf("Instructiunea SHOW_CURRENT\n");
-            token = strtok(NULL, " \n");
-            printf("Caracterul e %s\n", token);
+            showCurrent(&band);
         }
         else if (strcmp(token, "SHOW") == 0)
         {
-            printf("Instructiunea SHOW\n");
+            show(&band);
         }
         else if (strcmp(token, "UNDO") == 0)
         {
-            printf("Instructiunea UNDO\n");
+            // operation = pop(stack);
         }
         else if (strcmp(token, "REDO") == 0)
         {
-            printf("Instructiunea REDO\n");
         }
         else if (strcmp(token, "EXECUTE") == 0)
         {
-            printf("Instructiunea EXECUTE\n");
+            instruction = dequeue(&queue);
+            operation = instruction.opCode;
+            operand = instruction.operand;
+
+            switch (operation)
+            {
+            case '1':
+            {
+                moveLeft(&band);
+                break;
+            }
+            case '2':
+            {
+                moveRight(&band);
+                break;
+            }
+            case '3':
+            {
+                moveLeftChar(&band, operand);
+                break;
+            }
+            case '4':
+            {
+                moveRightChar(&band, operand);
+                break;
+            }
+            case '5':
+            {
+                writeChar(&band, operand);
+                break;
+            }
+            case '6':
+            {
+                insertLeftChar(&band, operand);
+                break;
+            }
+            case '7':
+            {
+                insertRightChar(&band, operand);
+                break;
+            }
+            default:
+            {
+                fprintf(stderr, "Error: Unknown operation name\n");
+                exit(1);
+            }
+            }
         }
     }
 
-    // *** TESTE ***
+    fclose(input);
 
-    printf("banda initial: ");
-    show(&band);
-    printf("banda: ");
-    moveRight(&band);
-    show(&band);
-    printf("banda: ");
-    writeChar(&band, 'X');
-    show(&band);
-    printf("banda: ");
-    moveRight(&band);
-    show(&band);
-    printf("banda: ");
-    writeChar(&band, 'Y');
-    show(&band);
-    printf("banda: ");
-    moveLeft(&band);
-    show(&band);
-    printf("banda: ");
-    moveRight(&band);
-    show(&band);
+    // *** TESTE ***
 
     // *** TESTE ***
 
     return 0;
 }
-
