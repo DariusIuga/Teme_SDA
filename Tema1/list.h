@@ -18,9 +18,7 @@ typedef struct
 } doublyLinkedList;
 
 void initList(doublyLinkedList *);
-void addNode(doublyLinkedList *, char);
-void show(doublyLinkedList *);
-void showCurrent(doublyLinkedList *);
+
 void moveLeft(doublyLinkedList *);
 void moveRight(doublyLinkedList *);
 void moveLeftChar(doublyLinkedList *, char);
@@ -28,6 +26,8 @@ void moveRightChar(doublyLinkedList *, char);
 void writeChar(doublyLinkedList *, char);
 void insertLeftChar(doublyLinkedList *, char);
 void insertRightChar(doublyLinkedList *, char);
+void showCurrent(doublyLinkedList *);
+void show(doublyLinkedList *);
 
 void initList(doublyLinkedList *band)
 {
@@ -39,43 +39,9 @@ void initList(doublyLinkedList *band)
     band->finger = sentinel;
 }
 
-void addNode(doublyLinkedList *band, char elem)
-{
-    node *newNode = (node *)malloc(sizeof(node));
-    newNode->data = elem;
-    band->head->next = newNode;
-    band->tail = newNode;
-    band->finger = newNode;
-    newNode->prev = band->head;
-    newNode->next = NULL;
-}
-
-void show(doublyLinkedList *band)
-{
-    node *current = band->head->next;
-    while (current != NULL)
-    {
-        if (current == band->finger)
-        {
-            printf("|%c|", current->data);
-        }
-        else
-        {
-            printf("%c", current->data);
-        }
-        current = current->next;
-    }
-    printf("\n");
-}
-
-void showCurrent(doublyLinkedList *band)
-{
-    printf("%c\n", band->finger->data);
-}
-
 void moveLeft(doublyLinkedList *band)
 {
-    if (band->finger != band->head)
+    if (band->finger != band->head->next)
     {
         band->finger = band->finger->prev;
     }
@@ -177,4 +143,27 @@ void insertRightChar(doublyLinkedList *band, char elem)
         band->finger = band->finger->next;
         band->finger->data = elem;
     }
+}
+
+void showCurrent(doublyLinkedList *band)
+{
+    printf("%c\n", band->finger->data);
+}
+
+void show(doublyLinkedList *band)
+{
+    node *current = band->head->next;
+    while (current != NULL)
+    {
+        if (current == band->finger)
+        {
+            printf("|%c|", current->data);
+        }
+        else
+        {
+            printf("%c", current->data);
+        }
+        current = current->next;
+    }
+    printf("\n");
 }
