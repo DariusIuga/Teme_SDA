@@ -32,6 +32,7 @@ void showCurrent(FILE *file, doublyLinkedList *band);
 void show(FILE *file, doublyLinkedList *band);
 
 void moveFinger(doublyLinkedList *, void *);
+void testShow(doublyLinkedList *);
 
 void initList(doublyLinkedList *band)
 {
@@ -89,7 +90,7 @@ void moveLeftChar(FILE *file, doublyLinkedList *band, char elem)
         {
             band->finger = current;
             gasit = 1;
-            break;
+            return;
         }
         current = current->prev;
     }
@@ -106,20 +107,21 @@ void moveRightChar(doublyLinkedList *band, char elem)
     {
         if (current->data == elem)
         {
+            band->finger->prev = current->prev;
+            band->finger->next = current->next;
             band->finger = current;
-            break;
+            return;
         }
         current = current->next;
     }
-    if (current->data != elem)
-    {
-        node *newNode = (node *)malloc(sizeof(node));
-        band->tail->next = newNode;
-        newNode->prev = band->tail;
-        band->tail = newNode;
-        band->tail->next = NULL;
-        band->finger = band->tail;
-    }
+
+    node *newNode = (node *)malloc(sizeof(node));
+    newNode->data = '#';
+    band->tail->next = newNode;
+    newNode->prev = band->tail;
+    band->tail = newNode;
+    band->tail->next = NULL;
+    band->finger = band->tail;
 }
 
 void writeChar(doublyLinkedList *band, char elem)
@@ -144,7 +146,6 @@ void insertLeftChar(FILE *file, doublyLinkedList *band, char elem)
         fprintf(file, "ERROR\n");
     }
 }
-
 
 void insertRightChar(doublyLinkedList *band, char elem)
 {
@@ -189,6 +190,24 @@ void show(FILE *file, doublyLinkedList *band)
         current = current->next;
     }
     fprintf(file, "\n");
+}
+
+void testShow(doublyLinkedList *band)
+{
+    node *current = band->head->next;
+    while (current != NULL)
+    {
+        if (current == band->finger)
+        {
+            printf("|%c|", current->data);
+        }
+        else
+        {
+            printf("%c", current->data);
+        }
+        current = current->next;
+    }
+    printf("\n");
 }
 
 void moveFinger(doublyLinkedList *band, void *address)
