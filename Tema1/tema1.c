@@ -16,7 +16,7 @@ int main(void)
     stack undo, redo;
     parameters instruction;
     node *temp;
-    stackNode *oldNode,*newNode;
+    stackNode *oldNode, *newNode;
     FILE *input, *output;
 
     char line[BUF_LENGTH], *token, operation, operand;
@@ -182,10 +182,7 @@ int main(void)
             }
             }
         }
-        if (i > 74)
-        {
-            break;
-        }
+        testShow(&band);
     }
 
     fclose(input);
