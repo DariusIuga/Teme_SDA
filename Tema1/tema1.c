@@ -15,11 +15,12 @@ int main(void)
     instructionQueue queue;
     stack undo, redo;
     parameters instruction;
-    FILE *input, *output;
-    char line[BUF_LENGTH], *token, operation, operand;
-    unsigned short i, nrLinii;
     node *temp;
     stackNode *newNode;
+    FILE *input, *output;
+
+    char line[BUF_LENGTH], *token, operation, operand;
+    unsigned short i, nrLinii;
     newNode = (stackNode *)malloc(sizeof(stackNode));
 
     initList(&band);
@@ -85,8 +86,6 @@ int main(void)
             token = strtok(NULL, "\n");
             operand = token[0];
             enqueue(&queue, '5', operand);
-            flush(&undo);
-            flush(&redo);
         }
         else if (strcmp(token, "INSERT_LEFT") == 0)
         {
@@ -110,14 +109,17 @@ int main(void)
         }
         else if (strcmp(token, "UNDO") == 0)
         {
-            newNode = (stackNode *)malloc(sizeof(stackNode));
-            newNode->address = (void*)band.finger;
-            push(&redo, newNode);
-            newNode->address = pop(&undo);
+            void *aux = (void *)band.finger;
             moveFinger(&band, newNode->address);
+            newNode->address = aux;
+            push(&redo, newNode);
         }
         else if (strcmp(token, "REDO") == 0)
         {
+            void *aux = (void *)band.finger;
+            moveFinger(&band, newNode->address);
+            newNode->address = aux;
+            push(&undo, newNode);
         }
         else if (strcmp(token, "EXECUTE") == 0)
         {
@@ -148,7 +150,7 @@ int main(void)
             }
             case '3':
             {
-                moveLeftChar(&band, operand);
+                moveLeftChar(output,&band, operand);
                 break;
             }
             case '4':
@@ -159,11 +161,13 @@ int main(void)
             case '5':
             {
                 writeChar(&band, operand);
+                flush(&undo);
+                flush(&redo);
                 break;
             }
             case '6':
             {
-                insertLeftChar(&band, operand);
+                insertLeftChar(output,&band, operand);
                 break;
             }
             case '7':
