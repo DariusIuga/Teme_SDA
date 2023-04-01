@@ -8,8 +8,8 @@ typedef struct node node;
 struct node
 {
     char data;
-    node *next;
     node *prev;
+    node *next;
 };
 
 typedef struct
@@ -28,8 +28,10 @@ void moveRightChar(doublyLinkedList *, char);
 void writeChar(doublyLinkedList *, char);
 void insertLeftChar(doublyLinkedList *, char);
 void insertRightChar(doublyLinkedList *, char);
-void showCurrent(FILE *fisier, doublyLinkedList *band);
-void show(FILE *fisier, doublyLinkedList *band);
+void showCurrent(FILE *file, doublyLinkedList *band);
+void show(FILE *file, doublyLinkedList *band);
+
+void moveFinger(doublyLinkedList *, void *);
 
 void initList(doublyLinkedList *band)
 {
@@ -167,25 +169,43 @@ void insertRightChar(doublyLinkedList *band, char elem)
     }
 }
 
-void showCurrent(FILE *fisier, doublyLinkedList *band)
+void showCurrent(FILE *file, doublyLinkedList *band)
 {
-    fprintf(fisier, "%c\n", band->finger->data);
+    fprintf(file, "%c\n", band->finger->data);
 }
 
-void show(FILE *fisier, doublyLinkedList *band)
+void show(FILE *file, doublyLinkedList *band)
 {
     node *current = band->head->next;
     while (current != NULL)
     {
         if (current == band->finger)
         {
-            fprintf(fisier, "|%c|", current->data);
+            fprintf(file, "|%c|", current->data);
         }
         else
         {
-            fprintf(fisier, "%c", current->data);
+            fprintf(file, "%c", current->data);
         }
         current = current->next;
     }
-    fprintf(fisier, "\n");
+    fprintf(file, "\n");
+}
+
+void moveFinger(doublyLinkedList *band, void *address)
+{
+    node *current = band->head->next;
+    while (current != NULL)
+    {
+        if ((void*)current == address)
+        {
+            band->finger = current;
+            return;
+        }
+        else
+        {
+            current = current->next;
+        }
+    }
+    fprintf(stderr, "Nodul cu aceasta adresa nu se gaseste in lista!\n");
 }
