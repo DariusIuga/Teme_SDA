@@ -110,7 +110,11 @@ int main(void)
         }
         else if (strcmp(token, "UNDO") == 0)
         {
-            // operation = pop(stack);
+            newNode = (stackNode *)malloc(sizeof(stackNode));
+            newNode->address = (void*)band.finger;
+            push(&redo, newNode);
+            newNode->address = pop(&undo);
+            moveFinger(&band, newNode->address);
         }
         else if (strcmp(token, "REDO") == 0)
         {
