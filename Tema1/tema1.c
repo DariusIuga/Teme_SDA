@@ -16,11 +16,12 @@ int main(void)
     stack undo, redo;
     parameters instruction;
     node *temp;
-    stackNode *newNode;
+    stackNode *oldNode,*newNode;
     FILE *input, *output;
 
     char line[BUF_LENGTH], *token, operation, operand;
     unsigned short i, nrLinii;
+    oldNode = (stackNode *)malloc(sizeof(stackNode));
     newNode = (stackNode *)malloc(sizeof(stackNode));
 
     initList(&band);
@@ -109,17 +110,17 @@ int main(void)
         }
         else if (strcmp(token, "UNDO") == 0)
         {
-            void *aux = (void *)band.finger;
-            moveFinger(&band, newNode->address);
-            newNode->address = aux;
+            oldNode->address = pop(&undo);
+            newNode->address = (void *)band.finger;
             push(&redo, newNode);
+            moveFinger(&band, oldNode->address);
         }
         else if (strcmp(token, "REDO") == 0)
         {
-            void *aux = (void *)band.finger;
-            moveFinger(&band, newNode->address);
-            newNode->address = aux;
+            oldNode->address = pop(&redo);
+            newNode->address = (void *)band.finger;
             push(&undo, newNode);
+            moveFinger(&band, oldNode->address);
         }
         else if (strcmp(token, "EXECUTE") == 0)
         {
@@ -134,23 +135,23 @@ int main(void)
                 temp = moveLeft(&band);
                 if (temp != NULL)
                 {
-                    newNode = (stackNode *)malloc(sizeof(stackNode));
-                    newNode->address = (void *)temp;
-                    push(&undo, newNode);
+                    oldNode = (stackNode *)malloc(sizeof(stackNode));
+                    oldNode->address = (void *)temp;
+                    push(&undo, oldNode);
                 }
                 break;
             }
             case '2':
             {
                 temp = moveRight(&band);
-                newNode = (stackNode *)malloc(sizeof(stackNode));
-                newNode->address = (void *)temp;
-                push(&undo, newNode);
+                oldNode = (stackNode *)malloc(sizeof(stackNode));
+                oldNode->address = (void *)temp;
+                push(&undo, oldNode);
                 break;
             }
             case '3':
             {
-                moveLeftChar(output,&band, operand);
+                moveLeftChar(output, &band, operand);
                 break;
             }
             case '4':
@@ -167,7 +168,7 @@ int main(void)
             }
             case '6':
             {
-                insertLeftChar(output,&band, operand);
+                insertLeftChar(output, &band, operand);
                 break;
             }
             case '7':
@@ -177,10 +178,13 @@ int main(void)
             }
             default:
             {
-                fprintf(stderr, "Error: Unknown operation name\n");
-                exit(1);
+                fprintf(output, "ERROR\n");
             }
             }
+        }
+        if (i > 74)
+        {
+            break;
         }
     }
 
