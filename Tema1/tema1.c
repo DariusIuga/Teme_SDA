@@ -1,8 +1,10 @@
+/* IUGA Darius-Gabriel-Ioan - 314CC */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "queue.h"
 #include "list.h"
+#include "queue.h"
 #include "stack.h"
 
 #define BUF_LENGTH 19
@@ -12,19 +14,26 @@ int main(void)
     doublyLinkedList band;
     instructionQueue queue;
     stack stack;
-    FILE *input;
+    parameters instruction;
+    FILE *input, *output;
     char line[BUF_LENGTH], *token, operation, operand;
     unsigned short i, nrLinii;
-    parameters instruction;
+    node *temp;
 
     initList(&band);
     moveRight(&band);
     initQueue(&queue);
     initStack(&stack);
     input = fopen("tema1.in", "r");
+    output = fopen("tema1.out", "w");
     if (input == NULL)
     {
-        printf("Eroare la deschiderea fisierului tema1.in!\n");
+        fprintf(stderr, "Eroare la deschiderea fisierului tema1.in!\n");
+        return 1;
+    }
+    if (output == NULL)
+    {
+        fprintf(stderr, "Eroare la deschiderea fisierului tema1.out!\n");
         return 1;
     }
 
@@ -55,51 +64,49 @@ int main(void)
         if (strcmp(token, "MOVE_LEFT") == 0)
         {
             enqueue(&queue, '1', '\0');
-            push(&stack, 'l');
         }
         else if (strcmp(token, "MOVE_RIGHT") == 0)
         {
             enqueue(&queue, '2', '\0');
-            push(&stack, 'r');
         }
         else if (strcmp(token, "MOVE_LEFT_CHAR") == 0)
         {
-            token = strtok(NULL, " \n");
+            token = strtok(NULL, "\n");
             operand = token[0];
             enqueue(&queue, '3', operand);
         }
         else if (strcmp(token, "MOVE_RIGHT_CHAR") == 0)
         {
-            token = strtok(NULL, " \n");
+            token = strtok(NULL, "\n");
             operand = token[0];
             enqueue(&queue, '4', operand);
         }
         else if (strcmp(token, "WRITE") == 0)
         {
-            token = strtok(NULL, " \n");
+            token = strtok(NULL, "\n");
             operand = token[0];
             enqueue(&queue, '5', operand);
             flush(&stack);
         }
         else if (strcmp(token, "INSERT_LEFT") == 0)
         {
-            token = strtok(NULL, " \n");
+            token = strtok(NULL, "\n");
             operand = token[0];
             enqueue(&queue, '6', operand);
         }
         else if (strcmp(token, "INSERT_RIGHT") == 0)
         {
-            token = strtok(NULL, " \n");
+            token = strtok(NULL, "\n");
             operand = token[0];
             enqueue(&queue, '7', operand);
         }
         else if (strcmp(token, "SHOW_CURRENT") == 0)
         {
-            showCurrent(&band);
+            showCurrent(output, &band);
         }
         else if (strcmp(token, "SHOW") == 0)
         {
-            show(&band);
+            show(output, &band);
         }
         else if (strcmp(token, "UNDO") == 0)
         {
@@ -118,12 +125,23 @@ int main(void)
             {
             case '1':
             {
-                moveLeft(&band);
+                temp = moveLeft(&band);
+                if (temp != NULL)
+                {
+                    stackNode *newNode = (stackNode *)malloc(sizeof(stackNode));
+                    newNode->data = temp->data;
+                    newNode->next = NULL;
+                    push(&stack, newNode);
+                }
                 break;
             }
             case '2':
             {
-                moveRight(&band);
+                temp=moveRight(&band);
+                stackNode *newNode=(stackNode*)malloc(sizeof(stackNode));
+                newNode->data = temp->data;
+                newNode->next = NULL;
+                push(&stack, newNode);
                 break;
             }
             case '3':
@@ -161,6 +179,7 @@ int main(void)
     }
 
     fclose(input);
+    fclose(output);
 
     // *** TESTE ***
 
