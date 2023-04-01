@@ -1,3 +1,5 @@
+/* IUGA Darius-Gabriel-Ioan - 314CC */
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -5,7 +7,7 @@ typedef struct stackNode stackNode;
 
 struct stackNode
 {
-    char opCode;
+    char data;
     stackNode *next;
 };
 
@@ -16,8 +18,8 @@ typedef struct
 } stack;
 
 void initStack(stack *);
-void push(stack *, char);
-//void pop(stack *, char);
+void push(stack *,stackNode*);
+// void pop(stack *);
 void flush(stack *);
 
 void initStack(stack *insStack)
@@ -26,10 +28,8 @@ void initStack(stack *insStack)
     insStack->bottom = NULL;
 }
 
-void push(stack *insStack, char opCode)
+void push(stack *insStack, stackNode *newNode)
 {
-    stackNode *newNode = (stackNode *)malloc(sizeof(stackNode));
-    newNode->opCode = opCode;
     if (insStack->top == NULL || insStack->bottom == NULL)
     {
         insStack->top = newNode;
