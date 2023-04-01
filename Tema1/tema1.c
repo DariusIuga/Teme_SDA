@@ -13,17 +13,21 @@ int main(void)
 {
     doublyLinkedList band;
     instructionQueue queue;
-    stack stack;
+    stack undo, redo;
     parameters instruction;
     FILE *input, *output;
     char line[BUF_LENGTH], *token, operation, operand;
     unsigned short i, nrLinii;
     node *temp;
+    stackNode *newNode;
+    newNode = (stackNode *)malloc(sizeof(stackNode));
 
     initList(&band);
     moveRight(&band);
     initQueue(&queue);
-    initStack(&stack);
+    initStack(&undo);
+    initStack(&redo);
+
     input = fopen("tema1.in", "r");
     output = fopen("tema1.out", "w");
     if (input == NULL)
@@ -45,7 +49,7 @@ int main(void)
         printf("%s\n", line);
         token = strtok(line, " \n");
 
-        /*  Asocieri operatii de tip update - cod
+        /*  Codificare operatii de tip update
 
         MOVE_LEFT == '1'
         MOVE_RIGHT == '2'
@@ -54,11 +58,6 @@ int main(void)
         WRITE == '5'
         INSERT_LEFT == '6'
         INSERT_RIGHT == '7'
-
-            Asocieri pentru stivele UNDO/REDO
-
-        MOVE_LEFT='l'
-        MOVE_RIGHT='r'
 
         */
         if (strcmp(token, "MOVE_LEFT") == 0)
@@ -86,7 +85,8 @@ int main(void)
             token = strtok(NULL, "\n");
             operand = token[0];
             enqueue(&queue, '5', operand);
-            flush(&stack);
+            flush(&undo);
+            flush(&redo);
         }
         else if (strcmp(token, "INSERT_LEFT") == 0)
         {
@@ -128,20 +128,18 @@ int main(void)
                 temp = moveLeft(&band);
                 if (temp != NULL)
                 {
-                    stackNode *newNode = (stackNode *)malloc(sizeof(stackNode));
-                    newNode->data = temp->data;
-                    newNode->next = NULL;
-                    push(&stack, newNode);
+                    newNode = (stackNode *)malloc(sizeof(stackNode));
+                    newNode->address = (void *)temp;
+                    push(&undo, newNode);
                 }
                 break;
             }
             case '2':
             {
-                temp=moveRight(&band);
-                stackNode *newNode=(stackNode*)malloc(sizeof(stackNode));
-                newNode->data = temp->data;
-                newNode->next = NULL;
-                push(&stack, newNode);
+                temp = moveRight(&band);
+                newNode = (stackNode *)malloc(sizeof(stackNode));
+                newNode->address = (void *)temp;
+                push(&undo, newNode);
                 break;
             }
             case '3':
