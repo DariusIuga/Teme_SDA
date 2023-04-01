@@ -1,3 +1,5 @@
+/* IUGA Darius-Gabriel-Ioan - 314CC */
+
 #include <stdio.h>
 #include <stdlib.h>
 
