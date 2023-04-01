@@ -7,7 +7,7 @@ typedef struct stackNode stackNode;
 
 struct stackNode
 {
-    char data;
+    void *address;
     stackNode *next;
 };
 
@@ -18,8 +18,8 @@ typedef struct
 } stack;
 
 void initStack(stack *);
-void push(stack *,stackNode*);
-// void pop(stack *);
+void push(stack *, stackNode *);
+void* pop(stack *);
 void flush(stack *);
 
 void initStack(stack *insStack)
@@ -28,8 +28,10 @@ void initStack(stack *insStack)
     insStack->bottom = NULL;
 }
 
-void push(stack *insStack, stackNode *newNode)
+void push(stack *insStack, stackNode *node)
 {
+    stackNode *newNode = (stackNode *)malloc(sizeof(stackNode));
+    newNode->address = node->address;
     if (insStack->top == NULL || insStack->bottom == NULL)
     {
         insStack->top = newNode;
@@ -44,24 +46,25 @@ void push(stack *insStack, stackNode *newNode)
     }
 }
 
-/*char pop(stack *insStack)
+void* pop(stack *insStack)
 {
-    stackNode *remNode = insStack->top;
-    char opCode = remNode->opCode;
+    stackNode *current = insStack->top;
+    stackNode *remNode = (stackNode *)malloc(sizeof(stackNode));
+    remNode->address = current->address;
     if (insStack->top == insStack->bottom)
     {
         insStack->top = NULL;
         insStack->bottom = NULL;
-        free(remNode);
+        free(current);
     }
     else
     {
         insStack->top = insStack->top->next;
-        free(remNode);
+        free(current);
     }
 
-    return opCode;
-}*/
+    return remNode->address;
+}
 
 void flush(stack *insStack)
 {
