@@ -1,3 +1,5 @@
+/* IUGA Darius-Gabriel-Ioan - 314CC */
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -6,8 +8,8 @@ typedef struct node node;
 struct node
 {
     char data;
-    node *prev;
     node *next;
+    node *prev;
 };
 
 typedef struct
@@ -19,15 +21,15 @@ typedef struct
 
 void initList(doublyLinkedList *);
 
-void moveLeft(doublyLinkedList *);
-void moveRight(doublyLinkedList *);
+node *moveLeft(doublyLinkedList *);
+node *moveRight(doublyLinkedList *);
 void moveLeftChar(doublyLinkedList *, char);
 void moveRightChar(doublyLinkedList *, char);
 void writeChar(doublyLinkedList *, char);
 void insertLeftChar(doublyLinkedList *, char);
 void insertRightChar(doublyLinkedList *, char);
-void showCurrent(doublyLinkedList *);
-void show(doublyLinkedList *);
+void showCurrent(FILE *fisier, doublyLinkedList *band);
+void show(FILE *fisier, doublyLinkedList *band);
 
 void initList(doublyLinkedList *band)
 {
@@ -39,16 +41,24 @@ void initList(doublyLinkedList *band)
     band->finger = sentinel;
 }
 
-void moveLeft(doublyLinkedList *band)
+node *moveLeft(doublyLinkedList *band)
 {
     if (band->finger != band->head->next)
     {
+        node *temp = band->finger;
         band->finger = band->finger->prev;
+        return temp;
+    }
+    else
+    {
+        // Operatia nu s-a putut executa
+        return NULL;
     }
 }
 
-void moveRight(doublyLinkedList *band)
+node *moveRight(doublyLinkedList *band)
 {
+    node *temp = band->finger;
     if (band->finger == band->tail)
     {
         node *newNode = (node *)malloc(sizeof(node));
@@ -63,6 +73,8 @@ void moveRight(doublyLinkedList *band)
     {
         band->finger = band->finger->next;
     }
+
+    return temp;
 }
 
 void moveLeftChar(doublyLinkedList *band, char elem)
@@ -115,23 +127,30 @@ void writeChar(doublyLinkedList *band, char elem)
 
 void insertLeftChar(doublyLinkedList *band, char elem)
 {
+
     if (band->finger != band->head->next)
     {
-        band->finger = band->finger->prev;
-        band->finger->data = elem;
+        node *newNode = (node *)malloc(sizeof(node));
+        newNode->data = elem;
+        newNode->next = band->finger;
+        newNode->prev = band->finger->prev;
+        band->finger->prev->next = newNode;
+        band->finger->prev = newNode;
+        band->finger = newNode;
     }
     else
     {
-        printf("ERROR\n");
+        fprintf(stderr, "ERROR\n");
+        exit(1);
     }
 }
 
 void insertRightChar(doublyLinkedList *band, char elem)
 {
+    node *newNode = (node *)malloc(sizeof(node));
+    newNode->data = elem;
     if (band->finger == band->tail)
     {
-        node *newNode = (node *)malloc(sizeof(node));
-        newNode->data = elem;
         band->tail->next = newNode;
         newNode->prev = band->tail;
         band->tail = newNode;
@@ -140,30 +159,33 @@ void insertRightChar(doublyLinkedList *band, char elem)
     }
     else
     {
+        newNode->next = band->finger->next;
+        newNode->prev = band->finger;
+        band->finger->next->prev = newNode;
+        band->finger->next = newNode;
         band->finger = band->finger->next;
-        band->finger->data = elem;
     }
 }
 
-void showCurrent(doublyLinkedList *band)
+void showCurrent(FILE *fisier, doublyLinkedList *band)
 {
-    printf("%c\n", band->finger->data);
+    fprintf(fisier, "%c\n", band->finger->data);
 }
 
-void show(doublyLinkedList *band)
+void show(FILE *fisier, doublyLinkedList *band)
 {
     node *current = band->head->next;
     while (current != NULL)
     {
         if (current == band->finger)
         {
-            printf("|%c|", current->data);
+            fprintf(fisier, "|%c|", current->data);
         }
         else
         {
-            printf("%c", current->data);
+            fprintf(fisier, "%c", current->data);
         }
         current = current->next;
     }
-    printf("\n");
+    fprintf(fisier, "\n");
 }
