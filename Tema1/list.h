@@ -107,8 +107,6 @@ void moveRightChar(doublyLinkedList *band, char elem)
     {
         if (current->data == elem)
         {
-            band->finger->prev = current->prev;
-            band->finger->next = current->next;
             band->finger = current;
             return;
         }
