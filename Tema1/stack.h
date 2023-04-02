@@ -5,12 +5,14 @@
 
 typedef struct stackNode stackNode;
 
+// Un nod al stivelor UNDO/REDO
 struct stackNode
 {
     void *address;
     stackNode *next;
 };
 
+// Reprezentarea unei stive UNDO/REDO
 typedef struct
 {
     stackNode *top;
@@ -32,8 +34,9 @@ void push(stack *insStack, stackNode *node)
 {
     stackNode *newNode = (stackNode *)malloc(sizeof(stackNode));
     newNode->address = node->address;
-    if (insStack->top == NULL || insStack->bottom == NULL)
+    if (insStack->top == NULL && insStack->bottom == NULL)
     {
+        // Stiva este vida
         insStack->top = newNode;
         insStack->bottom = newNode;
         insStack->top->next = NULL;
@@ -46,6 +49,7 @@ void push(stack *insStack, stackNode *node)
     }
 }
 
+// Returneaza adresa continuta de nodul din varf
 void* pop(stack *insStack)
 {
     stackNode *current = insStack->top;
@@ -53,6 +57,7 @@ void* pop(stack *insStack)
     remNode->address = current->address;
     if (insStack->top == insStack->bottom)
     {
+        // Stiva are un singur nod
         insStack->top = NULL;
         insStack->bottom = NULL;
         free(current);
