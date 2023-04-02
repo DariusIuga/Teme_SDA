@@ -64,7 +64,7 @@ parameters dequeue(instructionQueue *queue)
 
     if (queue->front == NULL)
     {
-        fprintf(stderr,"Coada este vida\n");
+        fprintf(stderr, "Coada este vida\n");
         exit(1);
     }
 
