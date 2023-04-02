@@ -26,8 +26,6 @@ int main(void)
     void *temp;
     char line[BUF_LENGTH], *token, operation, operand;
     unsigned short i, nrLinii;
-    oldNode = (stackNode *)malloc(sizeof(stackNode));
-    newNode = (stackNode *)malloc(sizeof(stackNode));
 
     // Initializarea structurilor folosite
     initList(&band);
@@ -57,8 +55,8 @@ int main(void)
     {
         // Citesc cate o linie in line
         fgets(line, BUF_LENGTH, input);
-        printf("%s\n", line);
-        // Initial token contine instructiunea citita pe linia curenta
+        // printf("%s\n", line);
+        //  Initial token contine instructiunea citita pe linia curenta
         token = strtok(line, " \n");
 
         /*  Codificare operatii de tip update
@@ -123,10 +121,14 @@ int main(void)
         // Apelez aceeasi functie pentru UNDO si REDO
         else if (strcmp(token, "UNDO") == 0)
         {
+            oldNode = (stackNode *)malloc(sizeof(stackNode));
+            newNode = (stackNode *)malloc(sizeof(stackNode));
             undoRedo(&band, oldNode, newNode, &undo, &redo);
         }
         else if (strcmp(token, "REDO") == 0)
         {
+            oldNode = (stackNode *)malloc(sizeof(stackNode));
+            newNode = (stackNode *)malloc(sizeof(stackNode));
             undoRedo(&band, oldNode, newNode, &redo, &undo);
         }
         else if (strcmp(token, "EXECUTE") == 0)
@@ -144,7 +146,7 @@ int main(void)
             {
                 /*  Daca degetul este chiar la dreapta celulei santinela,
                     operatia MOVE_LEFT nu poate fi executata,
-                    deci nu va fi introdusa adresa unui nod precedent 
+                    deci nu va fi introdusa adresa unui nod precedent
                     in stiva UNDO */
                 temp = moveLeft(&band);
                 if (temp != NULL)
@@ -152,6 +154,7 @@ int main(void)
                     oldNode = (stackNode *)malloc(sizeof(stackNode));
                     oldNode->address = temp;
                     push(&undo, oldNode);
+                    free(oldNode);
                 }
                 break;
             }
@@ -160,6 +163,7 @@ int main(void)
                 oldNode = (stackNode *)malloc(sizeof(stackNode));
                 oldNode->address = moveRight(&band);
                 push(&undo, oldNode);
+                free(oldNode);
                 break;
             }
             case '3':
@@ -197,12 +201,16 @@ int main(void)
             }
             }
         }
-        testShow(&band);
     }
 
-    // Se inchid fisierele folosite pentru input si output
+    //  Se inchid fisierele folosite pentru input si output
     fclose(input);
     fclose(output);
+
+    // Eliberarea memoriei folosite
+    freeList(&band);
+    flush(&undo);
+    flush(&redo);
 
     return 0;
 }
@@ -211,8 +219,14 @@ int main(void)
 // Pentru REDO e invers
 void undoRedo(dLL *band, sNode *old, sNode *new, stack *source, stack *dest)
 {
+    old = (stackNode *)malloc(sizeof(stackNode));
+    new = (stackNode *)malloc(sizeof(stackNode));
+
     old->address = pop(source);
     new->address = (void *)band->finger;
     push(dest, new);
     moveFinger(band, old->address);
+
+    free(old);
+    free(new);
 }
