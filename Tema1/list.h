@@ -39,7 +39,7 @@ void showCurrent(FILE *file, doublyLinkedList *band);
 void show(FILE *file, doublyLinkedList *band);
 
 void moveFinger(doublyLinkedList *, void *);
-void testShow(doublyLinkedList *);
+void freeList(doublyLinkedList *);
 
 void initList(doublyLinkedList *band)
 {
@@ -224,20 +224,19 @@ void moveFinger(doublyLinkedList *band, void *address)
     fprintf(stderr, "Nodul cu aceasta adresa nu se gaseste in lista!\n");
 }
 
-void testShow(doublyLinkedList *band)
+void freeList(doublyLinkedList *band)
 {
-    node *current = band->head->next;
-    while (current != NULL)
+    node *temp, *current = band->tail;
+    while (current != band->sentinel)
     {
-        if (current == band->finger)
-        {
-            printf("|%c|", current->data);
-        }
-        else
-        {
-            printf("%c", current->data);
-        }
-        current = current->next;
+        temp = current->prev;
+        free(current);
+        current = temp;
     }
-    printf("\n");
+
+    free(band->sentinel);
+    band->head = NULL;
+    band->tail = NULL;
+    band->finger = NULL;
+    band->sentinel = NULL;
 }
