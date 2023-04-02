@@ -1,3 +1,19 @@
-### TODO ###
+        ### Tema 1 SDA – Liste dublu inlantuite, stive si cozi ###
 
-    De scris implementarea
+    Descriere implementare:
+
+        1)Citirea inputului si codificare:
+        Dupa initializarea structurilor folosite pe parcursul programului si deschiderea fisierelor folosite pentru input si output, fiecare linie este citita in vectorul line. Din acesta se extrag, folosind strtok(), sirul de caractere ce identifica functia si in cazul unor operatii caracterul folosit ca parametru. 
+
+        2)Coada cu instructiuni:
+        Functiile Update sunt codificate, iar codurile si parametrii lor sunt introduse intr-o coada pentru instructiuni. Daca instructiunea curenta este "EXECUTE", aceste valori sunt extrase din coada. Printr-un switch operatia extrasa este efectuata asupra cozii.
+
+        3)Afisarea outputului:
+        Functia show() foloseste un pointer pentru a parcurge intreaga banda si afiseaza in fisierul pentru output fiecare caracter retinut in celule. Caracterul din celula indicata de deget este incadrat de '|'. Functia showCurrent() afiseaza doar caracterul din celula indicata de deget, in acelasi fisier.
+
+        4)Stivele UNDO/REDO:
+        Functiile moveLeft() si moveRight() returneaza adresa nodului la care indica degetul inaintea efectuarii operatiei respective. Daca operatia a fost efectuata cu succes, aceasta veche adresa este retinuta in nodul de stiva oldNode,care va fi adaugat si in stiva undo.
+        Nodurile stivelor UNDO si REDO au in campul address adresa unui element din banda.
+        Daca instructiunea curenta este UNDO, oldNode retine adresa elementului extras din undo. newNode va retine adresa elementului spre care pointeaza degetul, iar acesta va pointa dupa spre vechea adresa retinuta de oldNode. La final, newNode este pus in varful stivei. Analog si prentru REDO, doar ca se va extrage adresa veche din redo si se va pune adresa noua in undo. Ambele operatii sunt implementate prin aceeasi funcie.
+
+    Pe checkerul local am obtinut punctajul maxim la toate cele 30 de teste.
