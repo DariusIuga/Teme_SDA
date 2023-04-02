@@ -7,24 +7,32 @@
 #include "queue.h"
 #include "stack.h"
 
-#define BUF_LENGTH 19
+#define BUF_LENGTH 20
+typedef doublyLinkedList dLL;
+typedef stackNode sNode;
+
+void undoRedo(doublyLinkedList *, stackNode *, stackNode *, stack *, stack *);
 
 int main(void)
 {
+    // Declararea structurilor folosite in program
     doublyLinkedList band;
     instructionQueue queue;
     stack undo, redo;
     parameters instruction;
-    node *temp;
     stackNode *oldNode, *newNode;
     FILE *input, *output;
 
+    void *temp;
     char line[BUF_LENGTH], *token, operation, operand;
     unsigned short i, nrLinii;
     oldNode = (stackNode *)malloc(sizeof(stackNode));
     newNode = (stackNode *)malloc(sizeof(stackNode));
 
+    // Initializarea structurilor folosite
     initList(&band);
+    // Pe langal nodul santinela, banda contine initial si un nod
+    // cu un '#' drept continut
     moveRight(&band);
     initQueue(&queue);
     initStack(&undo);
@@ -47,8 +55,10 @@ int main(void)
     fgetc(input);
     for (i = 0; i < nrLinii; i++)
     {
+        // Citesc cate o linie in line
         fgets(line, BUF_LENGTH, input);
         printf("%s\n", line);
+        // Initial token contine instructiunea citita pe linia curenta
         token = strtok(line, " \n");
 
         /*  Codificare operatii de tip update
@@ -72,6 +82,8 @@ int main(void)
         }
         else if (strcmp(token, "MOVE_LEFT_CHAR") == 0)
         {
+            // Pentru operatiile care au caracter drept parametru,
+            // acesta e citit in token
             token = strtok(NULL, "\n");
             operand = token[0];
             enqueue(&queue, '3', operand);
@@ -108,44 +120,45 @@ int main(void)
         {
             show(output, &band);
         }
+        // Apelez aceeasi functie pentru UNDO si REDO
         else if (strcmp(token, "UNDO") == 0)
         {
-            oldNode->address = pop(&undo);
-            newNode->address = (void *)band.finger;
-            push(&redo, newNode);
-            moveFinger(&band, oldNode->address);
+            undoRedo(&band, oldNode, newNode, &undo, &redo);
         }
         else if (strcmp(token, "REDO") == 0)
         {
-            oldNode->address = pop(&redo);
-            newNode->address = (void *)band.finger;
-            push(&undo, newNode);
-            moveFinger(&band, oldNode->address);
+            undoRedo(&band, oldNode, newNode, &redo, &undo);
         }
         else if (strcmp(token, "EXECUTE") == 0)
         {
+            // Extrag codul si eventual parametrul
+            // pentru operatia din fata cozii
             instruction = dequeue(&queue);
             operation = instruction.opCode;
             operand = instruction.operand;
 
+            // In functie de codul primit execut operatia aferenta
             switch (operation)
             {
             case '1':
             {
+                /*  Daca degetul este chiar la dreapta celulei santinela,
+                    operatia MOVE_LEFT nu poate fi executata,
+                    deci nu va fi introdusa adresa unui nod precedent 
+                    in stiva UNDO */
                 temp = moveLeft(&band);
                 if (temp != NULL)
                 {
                     oldNode = (stackNode *)malloc(sizeof(stackNode));
-                    oldNode->address = (void *)temp;
+                    oldNode->address = temp;
                     push(&undo, oldNode);
                 }
                 break;
             }
             case '2':
             {
-                temp = moveRight(&band);
                 oldNode = (stackNode *)malloc(sizeof(stackNode));
-                oldNode->address = (void *)temp;
+                oldNode->address = moveRight(&band);
                 push(&undo, oldNode);
                 break;
             }
@@ -162,6 +175,7 @@ int main(void)
             case '5':
             {
                 writeChar(&band, operand);
+                // Golesc stivele la executia operatiei WRITE
                 flush(&undo);
                 flush(&redo);
                 break;
@@ -178,6 +192,7 @@ int main(void)
             }
             default:
             {
+                // Sirul de caractere citit nu corespunde vreunei operatii
                 fprintf(output, "ERROR\n");
             }
             }
@@ -185,12 +200,19 @@ int main(void)
         testShow(&band);
     }
 
+    // Se inchid fisierele folosite pentru input si output
     fclose(input);
     fclose(output);
 
-    // *** TESTE ***
-
-    // *** TESTE ***
-
     return 0;
+}
+
+// Pentru UNDO stiva sursa e undo si stiva destinatie e redo
+// Pentru REDO e invers
+void undoRedo(dLL *band, sNode *old, sNode *new, stack *source, stack *dest)
+{
+    old->address = pop(source);
+    new->address = (void *)band->finger;
+    push(dest, new);
+    moveFinger(band, old->address);
 }
