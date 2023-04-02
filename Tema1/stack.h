@@ -21,7 +21,7 @@ typedef struct
 
 void initStack(stack *);
 void push(stack *, stackNode *);
-void* pop(stack *);
+void *pop(stack *);
 void flush(stack *);
 
 void initStack(stack *insStack)
@@ -50,25 +50,29 @@ void push(stack *insStack, stackNode *node)
 }
 
 // Returneaza adresa continuta de nodul din varf
-void* pop(stack *insStack)
+void *pop(stack *insStack)
 {
+    if (insStack == NULL || insStack->top == NULL)
+    {
+        return NULL; 
+    }
+
     stackNode *current = insStack->top;
-    stackNode *remNode = (stackNode *)malloc(sizeof(stackNode));
-    remNode->address = current->address;
+    void *address = current->address;
+
     if (insStack->top == insStack->bottom)
     {
         // Stiva are un singur nod
         insStack->top = NULL;
         insStack->bottom = NULL;
-        free(current);
     }
     else
     {
         insStack->top = insStack->top->next;
-        free(current);
     }
 
-    return remNode->address;
+    free(current);
+    return address;
 }
 
 void flush(stack *insStack)
