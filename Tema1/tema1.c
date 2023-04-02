@@ -7,7 +7,7 @@
 #include "queue.h"
 #include "stack.h"
 
-#define BUF_LENGTH 20
+#define BUF_LENGTH 19
 typedef doublyLinkedList dLL;
 typedef stackNode sNode;
 
@@ -121,15 +121,20 @@ int main(void)
         // Apelez aceeasi functie pentru UNDO si REDO
         else if (strcmp(token, "UNDO") == 0)
         {
+
             oldNode = (stackNode *)malloc(sizeof(stackNode));
             newNode = (stackNode *)malloc(sizeof(stackNode));
             undoRedo(&band, oldNode, newNode, &undo, &redo);
+            free(oldNode);
+            free(newNode);
         }
         else if (strcmp(token, "REDO") == 0)
         {
             oldNode = (stackNode *)malloc(sizeof(stackNode));
             newNode = (stackNode *)malloc(sizeof(stackNode));
             undoRedo(&band, oldNode, newNode, &redo, &undo);
+            free(oldNode);
+            free(newNode);
         }
         else if (strcmp(token, "EXECUTE") == 0)
         {
@@ -219,14 +224,8 @@ int main(void)
 // Pentru REDO e invers
 void undoRedo(dLL *band, sNode *old, sNode *new, stack *source, stack *dest)
 {
-    old = (stackNode *)malloc(sizeof(stackNode));
-    new = (stackNode *)malloc(sizeof(stackNode));
-
     old->address = pop(source);
     new->address = (void *)band->finger;
     push(dest, new);
     moveFinger(band, old->address);
-
-    free(old);
-    free(new);
 }
