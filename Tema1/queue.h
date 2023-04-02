@@ -3,22 +3,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct insNode insNode;
+typedef struct queueNode queueNode;
 typedef struct parameters parameters;
 
-struct insNode
+// Un nod al cozii pentru instructiun
+struct queueNode
 {
     char opCode;
     char operand;
-    insNode *next;
+    queueNode *next;
 };
 
+// Reprezentarea intregii cozi de instructiuni
 typedef struct
 {
-    insNode *front;
-    insNode *rear;
+    queueNode *front;
+    queueNode *rear;
 } instructionQueue;
 
+// Parametrii folositi in main pentru executarea instructiunilor
 struct parameters
 {
     char opCode;
@@ -37,11 +40,12 @@ void initQueue(instructionQueue *queue)
 
 void enqueue(instructionQueue *queue, char opCode, char operand)
 {
-    insNode *newNode = (insNode *)malloc(sizeof(insNode));
+    queueNode *newNode = (queueNode *)malloc(sizeof(queueNode));
     newNode->opCode = opCode;
     newNode->operand = operand;
     if (queue->front == NULL)
     {
+        // Coada e vida
         queue->front = newNode;
         queue->rear = newNode;
         newNode->next = NULL;
@@ -55,19 +59,20 @@ void enqueue(instructionQueue *queue, char opCode, char operand)
 
 parameters dequeue(instructionQueue *queue)
 {
-    insNode *remNode;
-    parameters x;
+    queueNode *remNode;
+    parameters opValues;
 
     if (queue->front == NULL)
     {
-        printf("Coada este vida\n");
+        fprintf(stderr,"Coada este vida\n");
         exit(1);
     }
 
-    x.opCode = queue->front->opCode;
-    x.operand = queue->front->operand;
+    opValues.opCode = queue->front->opCode;
+    opValues.operand = queue->front->operand;
     if (queue->front != queue->rear)
     {
+        // Coada contine un singur nod
         remNode = queue->front;
         queue->front = queue->front->next;
         free(remNode);
@@ -79,5 +84,5 @@ parameters dequeue(instructionQueue *queue)
         queue->rear = NULL;
     }
 
-    return x;
+    return opValues;
 }
