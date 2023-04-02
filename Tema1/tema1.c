@@ -49,12 +49,19 @@ int main(void)
         return 1;
     }
 
-    fscanf(input, "%hu", &nrLinii);
+    if ((fscanf(input, "%hu", &nrLinii)) != 1)
+    {
+        fprintf(stderr, "Eroare la citirea nr de linii!\n");
+        return 1;
+    }
     fgetc(input);
     for (i = 0; i < nrLinii; i++)
     {
         // Citesc cate o linie in line
-        fgets(line, BUF_LENGTH, input);
+        if (fgets(line, BUF_LENGTH, input) == NULL)
+        {
+            fprintf(stderr, "Eroare la citirea liniei nr %d!\n", i + 1);
+        }
         // printf("%s\n", line);
         //  Initial token contine instructiunea citita pe linia curenta
         token = strtok(line, " \n");
