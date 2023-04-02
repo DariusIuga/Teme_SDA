@@ -5,6 +5,7 @@
 
 typedef struct node node;
 
+// Un nod al benzii
 struct node
 {
     char data;
@@ -12,22 +13,28 @@ struct node
     node *next;
 };
 
+// Reprezentarea intregii benzi
 typedef struct
 {
     node *head;
     node *tail;
     node *finger;
+    node *sentinel;
 } doublyLinkedList;
 
+// Initializarea listei
 void initList(doublyLinkedList *);
 
-node *moveLeft(doublyLinkedList *);
-node *moveRight(doublyLinkedList *);
+// Operatii de tip Update
+void *moveLeft(doublyLinkedList *);
+void *moveRight(doublyLinkedList *);
 void moveLeftChar(FILE *, doublyLinkedList *, char);
 void moveRightChar(doublyLinkedList *, char);
 void writeChar(doublyLinkedList *, char);
 void insertLeftChar(FILE *, doublyLinkedList *, char);
 void insertRightChar(doublyLinkedList *, char);
+
+// Operatii de tip Query
 void showCurrent(FILE *file, doublyLinkedList *band);
 void show(FILE *file, doublyLinkedList *band);
 
@@ -36,15 +43,17 @@ void testShow(doublyLinkedList *);
 
 void initList(doublyLinkedList *band)
 {
-    node *sentinel = (node *)malloc(sizeof(node));
-    sentinel->prev = NULL;
-    sentinel->next = NULL;
-    band->head = sentinel;
-    band->tail = sentinel;
-    band->finger = sentinel;
+    // Crearea nodului santinela
+    band->sentinel = (node *)malloc(sizeof(node));
+    band->sentinel->prev = NULL;
+    band->sentinel->next = NULL;
+    // Toti pointerii din structura benzii indica initial spre santinela
+    band->head = band->sentinel;
+    band->tail = band->sentinel;
+    band->finger = band->sentinel;
 }
 
-node *moveLeft(doublyLinkedList *band)
+void *moveLeft(doublyLinkedList *band)
 {
     if (band->finger != band->head->next)
     {
@@ -59,9 +68,10 @@ node *moveLeft(doublyLinkedList *band)
     }
 }
 
-node *moveRight(doublyLinkedList *band)
+void *moveRight(doublyLinkedList *band)
 {
     node *temp = band->finger;
+    // Se introduce un nod nou la finalul listei
     if (band->finger == band->tail)
     {
         node *newNode = (node *)malloc(sizeof(node));
@@ -113,6 +123,9 @@ void moveRightChar(doublyLinkedList *band, char elem)
         current = current->next;
     }
 
+    // Daca se iese din while, nu s-a gasit niciun nod cu acest caracter,
+    // deci se va introduce un nod nou la finalul listei, spre care va
+    // pointa tail
     node *newNode = (node *)malloc(sizeof(node));
     newNode->data = '#';
     band->tail->next = newNode;
@@ -141,6 +154,8 @@ void insertLeftChar(FILE *file, doublyLinkedList *band, char elem)
     }
     else
     {
+        // Caracterul nu poate fi inserat in nodul santinela,
+        // daca degetul pointeaza spre nodul din dreapta sa
         fprintf(file, "ERROR\n");
     }
 }
@@ -190,24 +205,7 @@ void show(FILE *file, doublyLinkedList *band)
     fprintf(file, "\n");
 }
 
-void testShow(doublyLinkedList *band)
-{
-    node *current = band->head->next;
-    while (current != NULL)
-    {
-        if (current == band->finger)
-        {
-            printf("|%c|", current->data);
-        }
-        else
-        {
-            printf("%c", current->data);
-        }
-        current = current->next;
-    }
-    printf("\n");
-}
-
+// Muta degetul pe nodul de la adresa data, daca acesta se gaseste in lista
 void moveFinger(doublyLinkedList *band, void *address)
 {
     node *current = band->head->next;
@@ -224,4 +222,22 @@ void moveFinger(doublyLinkedList *band, void *address)
         }
     }
     fprintf(stderr, "Nodul cu aceasta adresa nu se gaseste in lista!\n");
+}
+
+void testShow(doublyLinkedList *band)
+{
+    node *current = band->head->next;
+    while (current != NULL)
+    {
+        if (current == band->finger)
+        {
+            printf("|%c|", current->data);
+        }
+        else
+        {
+            printf("%c", current->data);
+        }
+        current = current->next;
+    }
+    printf("\n");
 }
