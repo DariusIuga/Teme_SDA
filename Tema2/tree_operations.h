@@ -31,8 +31,8 @@ struct tree_node
 typedef struct output_values
 {
     unsigned int depth;
-    unsigned int nr_final_blocks;
-    unsigned int biggest_side;
+    unsigned int nr;
+    unsigned int side;
 } output_values;
 
 void init_tree(tree_node **root, unsigned int width, unsigned int height)
@@ -54,7 +54,7 @@ void init_tree(tree_node **root, unsigned int width, unsigned int height)
 void init_leaf(tree_node **leaf, tree_node *parent)
 {
     *leaf = (tree_node *)malloc(sizeof(tree_node));
-    
+
     (*leaf)->type = 1;
     (*leaf)->depth = (parent->depth) + 1;
     (*leaf)->top_left = NULL;
@@ -75,10 +75,10 @@ void generate_subtrees(tree_node *parent)
     mid.y = (NW.y + SE.y) / 2;
 
     // Este alocata memorie pentru subarbori
-    init_leaf(&parent->top_left,parent);
-    init_leaf(&parent->top_right,parent);
-    init_leaf(&parent->bottom_right,parent);
-    init_leaf(&parent->bottom_left,parent);
+    init_leaf(&parent->top_left, parent);
+    init_leaf(&parent->top_right, parent);
+    init_leaf(&parent->bottom_right, parent);
+    init_leaf(&parent->bottom_left, parent);
 
     // Nodul parinte devine unul de tip inner
     parent->type = 0;
