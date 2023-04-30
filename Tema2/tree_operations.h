@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+typedef unsigned int u32;
+typedef unsigned long long u64;
+
 typedef struct pixel
 {
     unsigned char red, green, blue;
@@ -8,34 +11,47 @@ typedef struct pixel
 
 typedef struct point
 {
-    unsigned int x, y;
+    u32 x, y;
 } point;
 
 typedef struct tree_node tree_node;
 struct tree_node
 {
-    // 0==>intern; 1==>frunza;
-    unsigned char type;
-    unsigned char red;
-    unsigned char green;
-    unsigned char blue;
-    unsigned char depth;
-    point corner_top_left;
-    point corner_bottom_right;
     tree_node *top_left;
     tree_node *top_right;
     tree_node *bottom_right;
     tree_node *bottom_left;
+    // 0==>intern; 1==>frunza;
+    unsigned char type;
+    unsigned char depth;
+    point corner_top_left;
+    point corner_bottom_right;
 };
+
+typedef struct cell_data
+{
+    unsigned char type;
+    unsigned char depth;
+    unsigned char red;
+    unsigned char green;
+    unsigned char blue;
+} cell_data;
+
+typedef struct cell_array
+{
+    cell_data *array;
+    u32 length;
+    u32 capacity;
+} cell_array;
 
 typedef struct output_values
 {
-    unsigned int depth;
-    unsigned int nr;
-    unsigned int side;
+    u32 depth;
+    u32 nr;
+    u32 side;
 } output_values;
 
-void init_tree(tree_node **root, unsigned int width, unsigned int height)
+void init_tree(tree_node **root, u32 width, u32 height)
 {
     *root = (tree_node *)malloc(sizeof(tree_node));
 
@@ -106,4 +122,12 @@ void generate_subtrees(tree_node *parent)
     parent->bottom_left->corner_top_left.y = mid.y + 1;
     parent->bottom_left->corner_bottom_right.x = mid.x;
     parent->bottom_left->corner_bottom_right.y = SE.y;
+}
+
+int cmp_depth(const void *a, const void *b)
+{
+    const cell_data *cell_a = (const cell_data *)a;
+    const cell_data *cell_b = (const cell_data *)b;
+
+    return cell_a->depth - cell_b->depth;
 }
