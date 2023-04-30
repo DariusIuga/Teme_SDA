@@ -176,9 +176,9 @@ void calculate_mean(tree_node *block, pixel **image, u32 size, u64 *red, u64 *gr
     {
         for (j = block->corner_top_left.y; j <= block->corner_bottom_right.y; ++j)
         {
-            *red += image[i][j].red;
-            *green += image[i][j].green;
-            *blue += image[i][j].blue;
+            *red += image[j][i].red;
+            *green += image[j][i].green;
+            *blue += image[j][i].blue;
         }
     }
     *red /= size * size;
@@ -189,9 +189,9 @@ void calculate_mean(tree_node *block, pixel **image, u32 size, u64 *red, u64 *gr
     {
         for (j = block->corner_top_left.y; j <= block->corner_bottom_right.y; ++j)
         {
-            *mean += (*red - image[i][j].red) * (*red - image[i][j].red) +
-                     (*green - image[i][j].green) * (*green - image[i][j].green) +
-                     (*blue - image[i][j].blue) * (*blue - image[i][j].blue);
+            *mean += (*red - image[j][i].red) * (*red - image[j][i].red) +
+                     (*green - image[j][i].green) * (*green - image[j][i].green) +
+                     (*blue - image[j][i].blue) * (*blue - image[j][i].blue);
         }
     }
     *mean /= 3 * size * size;

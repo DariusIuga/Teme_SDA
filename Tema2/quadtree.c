@@ -6,8 +6,15 @@ int main(int argc, char **argv)
     u32 width, height, i;
     pixel **image;
     tree_node *root;
-    output_values output;
     FILE *in = NULL, *out = NULL;
+
+    // DEBUG MODE //
+    
+    // argc=5
+    // argv[1]=
+    // argv[2]=
+    // argv[3]=
+    // argv[4]=
 
     if (argc == 5)
     {
@@ -18,6 +25,7 @@ int main(int argc, char **argv)
         if (!strcmp(argv[1], "-c1"))
         {
             // Cerinta 1
+            output_values output;
             output.depth = 0;
             output.nr = 0;
             output.side = 0;
@@ -29,9 +37,10 @@ int main(int argc, char **argv)
             // Cerinta 2
             cell_array vector;
             init_vector(&vector);
-            compression(root, image, factor, width, vector);
+            compression(root, image, factor, width, &vector);
             qsort(vector.array, vector.length, sizeof(cell_data), cmp_depth);
             write_binary(&out, argv[4], vector, width);
+            free(vector.array);
         }
         for (i = 0; i < height; ++i)
         {
