@@ -1,5 +1,9 @@
+#ifndef TREE_OPERATIONS_H
+#define TREE_OPERATIONS_H
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef unsigned int u32;
 typedef unsigned long long u64;
@@ -50,6 +54,46 @@ typedef struct output_values
     u32 nr;
     u32 side;
 } output_values;
+
+pixel **read_ppm(FILE **in, char *name, u32 *width, u32 *height);
+void init_tree(tree_node **root, u32 width, u32 height);
+void init_leaf(tree_node **leaf, tree_node *parent);
+void generate_subtrees(tree_node *parent);
+void calculate_mean(tree_node *block, pixel **image, u32 size, u64 *red, u64 *green, u64 *blue, u64 *mean);
+void free_quadtree(tree_node *current);
+
+pixel **read_ppm(FILE **in, char *name, u32 *width, u32 *height)
+{
+    if ((*in = fopen(name, "rb")) == NULL)
+    {
+        fprintf(stderr, "Error when opening image ppm file!");
+    }
+    char type[2];
+    u32 max_value, i, j;
+    pixel **image;
+    fscanf(*in, "%s", type);
+    fgetc(*in);
+    fscanf(*in, "%u", width);
+    fgetc(*in);
+    fscanf(*in, "%u", height);
+    fgetc(*in);
+    fscanf(*in, "%u", &max_value);
+    fgetc(*in);
+
+    image = (pixel **)malloc(*height * sizeof(pixel *));
+    for (i = 0; i < *height; ++i)
+    {
+        image[i] = (pixel *)malloc(*width * sizeof(pixel));
+        for (j = 0; j < *width; ++j)
+        {
+            fread(&image[i][j].red, sizeof(char), 1, *in);
+            fread(&image[i][j].green, sizeof(char), 1, *in);
+            fread(&image[i][j].blue, sizeof(char), 1, *in);
+        }
+    }
+
+    return image;
+}
 
 void init_tree(tree_node **root, u32 width, u32 height)
 {
@@ -124,10 +168,49 @@ void generate_subtrees(tree_node *parent)
     parent->bottom_left->corner_bottom_right.y = SE.y;
 }
 
-int cmp_depth(const void *a, const void *b)
+void calculate_mean(tree_node *block, pixel **image, u32 size, u64 *red, u64 *green, u64 *blue, u64 *mean)
 {
-    const cell_data *cell_a = (const cell_data *)a;
-    const cell_data *cell_b = (const cell_data *)b;
+    u32 i, j;
 
-    return cell_a->depth - cell_b->depth;
+    for (i = block->corner_top_left.x; i <= block->corner_bottom_right.x; ++i)
+    {
+        for (j = block->corner_top_left.y; j <= block->corner_bottom_right.y; ++j)
+        {
+            *red += image[i][j].red;
+            *green += image[i][j].green;
+            *blue += image[i][j].blue;
+        }
+    }
+    *red /= size * size;
+    *green /= size * size;
+    *blue /= size * size;
+
+    for (i = block->corner_top_left.x; i <= block->corner_bottom_right.x; ++i)
+    {
+        for (j = block->corner_top_left.y; j <= block->corner_bottom_right.y; ++j)
+        {
+            *mean += (*red - image[i][j].red) * (*red - image[i][j].red) +
+                     (*green - image[i][j].green) * (*green - image[i][j].green) +
+                     (*blue - image[i][j].blue) * (*blue - image[i][j].blue);
+        }
+    }
+    *mean /= 3 * size * size;
 }
+
+void free_quadtree(tree_node *current)
+{
+    // Conditie de oprire: nodul este o frunza
+    if (current == NULL)
+    {
+        return;
+    }
+
+    free_quadtree(current->top_left);
+    free_quadtree(current->top_right);
+    free_quadtree(current->bottom_right);
+    free_quadtree(current->bottom_left);
+
+    free(current);
+}
+
+#endif

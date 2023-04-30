@@ -3,11 +3,11 @@ CFLAGS = -Wall -Wextra -g -O3
 
 all: build
 
-build: quadtree.c
+build: quadtree.c tree_operations.h cerinta1.h cerinta2.h
 	$(CC) $(CFLAGS) quadtree.c -o quadtree
 
 run: build
 	./quadtree
 
 clean:
-	rm -f quadtree quadtree.o
+	rm -f quadtree quadtree.o tree_operations cerinta1 cerinta2
