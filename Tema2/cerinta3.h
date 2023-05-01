@@ -51,7 +51,7 @@ void read_binary(FILE **in, char *name, cell_array *vector, u32 *size)
             }
         }
         // Daca nodul e o frunza, citim si valorile RGB
-        if (vector->array[i].type)
+        if (vector->array[i].type == 1)
         {
             if (fread(&(vector->array[i].red), sizeof(unsigned char), 1, *in) != 1)
             {
@@ -82,7 +82,7 @@ void vector_to_tree(cell_array vector, tree_node **current, u32 size, u32 i, u32
     }
     (*current)->type = vector.array[i].type;
     (*current)->depth = depth;
-    if ((*current)->type)
+    if ((*current)->type==1)
     {
         // Nodul e o frunza, retinem valorile RGB
         (*current)->red = vector.array[i].red;
