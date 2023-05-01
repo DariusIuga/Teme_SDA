@@ -74,13 +74,25 @@ pixel **read_ppm(FILE **in, char *name, u32 *size)
     }
     char type[2];
     u32 max_value, i, j;
-    fscanf(*in, "%s", type);
+    if (fscanf(*in, "%s", type) != 1)
+    {
+        fprintf(stderr, "Eroare la citirea datelor!\n");
+    }
     fgetc(*in);
-    fscanf(*in, "%u", size);
+    if (fscanf(*in, "%u", size) != 1)
+    {
+        fprintf(stderr, "Eroare la citirea datelor!\n");
+    }
     fgetc(*in);
-    fscanf(*in, "%u", size);
+    if (fscanf(*in, "%u", size) != 1)
+    {
+        fprintf(stderr, "Eroare la citirea datelor!\n");
+    }
     fgetc(*in);
-    fscanf(*in, "%u", &max_value);
+    if (fscanf(*in, "%u", &max_value) != 1)
+    {
+        fprintf(stderr, "Eroare la citirea datelor!\n");
+    }
     fgetc(*in);
     pixel **image = (pixel **)malloc(*size * sizeof(pixel *));
 
@@ -89,9 +101,18 @@ pixel **read_ppm(FILE **in, char *name, u32 *size)
         image[i] = (pixel *)malloc(*size * sizeof(pixel));
         for (j = 0; j < *size; ++j)
         {
-            fread(&image[i][j].red, sizeof(char), 1, *in);
-            fread(&image[i][j].green, sizeof(char), 1, *in);
-            fread(&image[i][j].blue, sizeof(char), 1, *in);
+            if (fread(&image[i][j].red, sizeof(char), 1, *in) != 1)
+            {
+                fprintf(stderr, "Eroare la citirea datelor!\n");
+            }
+            if (fread(&image[i][j].green, sizeof(char), 1, *in) != 1)
+            {
+                fprintf(stderr, "Eroare la citirea datelor!\n");
+            }
+            if (fread(&image[i][j].blue, sizeof(char), 1, *in) != 1)
+            {
+                fprintf(stderr, "Eroare la citirea datelor!\n");
+            }
         }
     }
 

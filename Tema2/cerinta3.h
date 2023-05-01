@@ -22,7 +22,7 @@ void read_binary(FILE **in, char *name, cell_array *vector, u32 *size)
         return;
     }
 
-    while (fread(&(vector->array[i].type), sizeof(unsigned char), 1, *in) == 1)
+    while (fread(&(vector->array[i].type), sizeof(unsigned char), 1, *in)==1)
     {
         if (vector->length >= vector->capacity)
         {

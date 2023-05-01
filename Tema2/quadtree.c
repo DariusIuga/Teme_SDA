@@ -19,10 +19,10 @@ int main(int argc, char **argv)
     // argv[4]= "quadtree.out";
 
     // Pentru cerinta 3:
-    argc = 4;
-    argv[1] = "-d";
-    argv[2] = "/home/darius/Documents/VS/C_C++/SDA/Teme/Tema_2/tests/input/test19_c2.out";
-    argv[3] = "quadtree.out";
+    // argc = 4;
+    // argv[1] = "-d";
+    // argv[2] = "/home/darius/Documents/VS/C_C++/SDA/Teme/Tema_2/tests/input/test8_c2.out";
+    // argv[3] = "quadtree.out";
 
     if (argc == 5)
     {
@@ -75,17 +75,6 @@ int main(int argc, char **argv)
         init_vector(&vector);
         // Citim dimensiunea imaginii si vectorul din fisierul binar
         read_binary(&in, argv[2], &vector, &size);
-
-        // for (i = 0; i < vector.length; ++i)
-        // {
-        //     printf("Tipul nodului %u este:%u\n", i, vector.array[i].type);
-        //     if (vector.array[i].type == 1)
-        //     {
-        //         printf("Red:%u ", vector.array[i].red);
-        //         printf("Green:%u ", vector.array[i].green);
-        //         printf("Blue:%u\n\n", vector.array[i].blue);
-        //     }
-        // }
         // Construim recursiv arborele cuaternar pe baza datelor din vector,
         // pornind de la indexul 0 al vectorului si nivelul 0 din arbore
         vector_to_tree(vector, &root, size, 0);
