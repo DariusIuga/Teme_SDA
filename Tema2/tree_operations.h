@@ -28,6 +28,9 @@ struct tree_node
     // 0==>intern; 1==>frunza;
     unsigned char type;
     unsigned char depth;
+    unsigned char red;
+    unsigned char green;
+    unsigned char blue;
     point corner_top_left;
     point corner_bottom_right;
 };
@@ -55,14 +58,15 @@ typedef struct output_values
     u32 side;
 } output_values;
 
-pixel **read_ppm(FILE **in, char *name, u32 *width, u32 *height);
-void init_tree(tree_node **root, u32 width, u32 height);
+pixel **read_ppm(FILE **in, char *name, u32 *size);
+void init_tree(tree_node **root, u32 size);
 void init_leaf(tree_node **leaf, tree_node *parent);
 void generate_subtrees(tree_node *parent);
 void calculate_mean(tree_node *block, pixel **image, u32 size, u64 *red, u64 *green, u64 *blue, u64 *mean);
+void init_vector(cell_array *vector);
 void free_quadtree(tree_node *current);
 
-pixel **read_ppm(FILE **in, char *name, u32 *width, u32 *height)
+pixel **read_ppm(FILE **in, char *name, u32 *size)
 {
     if ((*in = fopen(name, "rb")) == NULL)
     {
@@ -70,21 +74,20 @@ pixel **read_ppm(FILE **in, char *name, u32 *width, u32 *height)
     }
     char type[2];
     u32 max_value, i, j;
-    pixel **image;
     fscanf(*in, "%s", type);
     fgetc(*in);
-    fscanf(*in, "%u", width);
+    fscanf(*in, "%u", size);
     fgetc(*in);
-    fscanf(*in, "%u", height);
+    fscanf(*in, "%u", size);
     fgetc(*in);
     fscanf(*in, "%u", &max_value);
     fgetc(*in);
+    pixel **image = (pixel **)malloc(*size * sizeof(pixel *));
 
-    image = (pixel **)malloc(*height * sizeof(pixel *));
-    for (i = 0; i < *height; ++i)
+    for (i = 0; i < *size; ++i)
     {
-        image[i] = (pixel *)malloc(*width * sizeof(pixel));
-        for (j = 0; j < *width; ++j)
+        image[i] = (pixel *)malloc(*size * sizeof(pixel));
+        for (j = 0; j < *size; ++j)
         {
             fread(&image[i][j].red, sizeof(char), 1, *in);
             fread(&image[i][j].green, sizeof(char), 1, *in);
@@ -95,15 +98,15 @@ pixel **read_ppm(FILE **in, char *name, u32 *width, u32 *height)
     return image;
 }
 
-void init_tree(tree_node **root, u32 width, u32 height)
+void init_tree(tree_node **root, u32 size)
 {
     *root = (tree_node *)malloc(sizeof(tree_node));
 
     (*root)->type = 1;
     (*root)->corner_top_left.x = 0;
     (*root)->corner_top_left.y = 0;
-    (*root)->corner_bottom_right.x = width - 1;
-    (*root)->corner_bottom_right.y = height - 1;
+    (*root)->corner_bottom_right.x = size - 1;
+    (*root)->corner_bottom_right.y = size - 1;
     (*root)->depth = 0;
     (*root)->top_left = NULL;
     (*root)->top_right = NULL;
@@ -168,13 +171,13 @@ void generate_subtrees(tree_node *parent)
     parent->bottom_left->corner_bottom_right.y = SE.y;
 }
 
-void calculate_mean(tree_node *block, pixel **image, u32 size, u64 *red, u64 *green, u64 *blue, u64 *mean)
+void calculate_mean(tree_node *current, pixel **image, u32 size, u64 *red, u64 *green, u64 *blue, u64 *mean)
 {
     u32 i, j;
 
-    for (i = block->corner_top_left.x; i <= block->corner_bottom_right.x; ++i)
+    for (i = current->corner_top_left.x; i <= current->corner_bottom_right.x; ++i)
     {
-        for (j = block->corner_top_left.y; j <= block->corner_bottom_right.y; ++j)
+        for (j = current->corner_top_left.y; j <= current->corner_bottom_right.y; ++j)
         {
             *red += image[j][i].red;
             *green += image[j][i].green;
@@ -185,9 +188,9 @@ void calculate_mean(tree_node *block, pixel **image, u32 size, u64 *red, u64 *gr
     *green /= size * size;
     *blue /= size * size;
 
-    for (i = block->corner_top_left.x; i <= block->corner_bottom_right.x; ++i)
+    for (i = current->corner_top_left.x; i <= current->corner_bottom_right.x; ++i)
     {
-        for (j = block->corner_top_left.y; j <= block->corner_bottom_right.y; ++j)
+        for (j = current->corner_top_left.y; j <= current->corner_bottom_right.y; ++j)
         {
             *mean += (*red - image[j][i].red) * (*red - image[j][i].red) +
                      (*green - image[j][i].green) * (*green - image[j][i].green) +
@@ -195,6 +198,13 @@ void calculate_mean(tree_node *block, pixel **image, u32 size, u64 *red, u64 *gr
         }
     }
     *mean /= 3 * size * size;
+}
+
+void init_vector(cell_array *vector)
+{
+    vector->array = (cell_data *)malloc(sizeof(cell_data));
+    vector->length = 0;
+    vector->capacity = 1;
 }
 
 void free_quadtree(tree_node *current)

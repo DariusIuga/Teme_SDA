@@ -3,18 +3,10 @@
 
 #include "tree_operations.h"
 
-void init_vector(cell_array *vector);
 void add_cell(cell_array *vector, u64 red, u64 green, u64 blue, tree_node *block);
 void compression(tree_node *block, pixel **image, u32 factor, u32 size, cell_array *vector);
 void write_binary(FILE **out, char *name, cell_array vector, u32 size);
 int cmp_depth(const void *a, const void *b);
-
-void init_vector(cell_array *vector)
-{
-    vector->array = (cell_data *)malloc(sizeof(cell_data));
-    vector->length = 0;
-    vector->capacity = 1;
-}
 
 void add_cell(cell_array *vector, u64 red, u64 green, u64 blue, tree_node *block)
 {
@@ -67,7 +59,7 @@ void write_binary(FILE **out, char *name, cell_array vector, u32 size)
 {
     if ((*out = fopen(name, "wb")) == NULL)
     {
-        fprintf(stderr, "Error when creating output file!");
+        fprintf(stderr, "Error when writing to binary file!");
     }
     u32 i;
     fwrite(&size, sizeof(u32), 1, *out);

@@ -37,7 +37,7 @@ void write_text(FILE **out, char *name, output_values output)
 {
     if ((*out = fopen(name, "wt")) == NULL)
     {
-        fprintf(stderr, "Error when creating output file!");
+        fprintf(stderr, "Error when writing to text file!");
     }
     fprintf(*out, "%u\n%u\n%u\n", output.depth, output.nr, output.side);
 }
