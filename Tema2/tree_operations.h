@@ -1,3 +1,5 @@
+// Acest header contine functiile si structurile comune tuturor headerelor
+
 #ifndef TREE_OPERATIONS_H
 #define TREE_OPERATIONS_H
 
@@ -18,6 +20,7 @@ typedef struct point
     u32 x, y;
 } point;
 
+// Un nod din arborele cuaternar
 typedef struct tree_node tree_node;
 struct tree_node
 {
@@ -35,6 +38,7 @@ struct tree_node
     point corner_bottom_right;
 };
 
+// Valorile retinute in reprezentarea vectoriala a arborelui.
 typedef struct cell_data
 {
     unsigned char type;
@@ -44,19 +48,15 @@ typedef struct cell_data
     unsigned char blue;
 } cell_data;
 
+// Intreg vectorul prin care este reprezentat arborele.
+// length reprezinta nr de elemente retinute,
+// iar capacity memoria totala alocata.
 typedef struct cell_array
 {
     cell_data *array;
     u32 length;
     u32 capacity;
 } cell_array;
-
-typedef struct output_values
-{
-    u32 depth;
-    u32 nr;
-    u32 side;
-} output_values;
 
 pixel **read_ppm(FILE **in, char *name, u32 *size);
 void init_tree(tree_node **root, u32 size);

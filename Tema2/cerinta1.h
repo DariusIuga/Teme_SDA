@@ -3,6 +3,14 @@
 
 #include "tree_operations.h"
 
+// Vor fi scrise in fisierul text de output
+typedef struct output_values
+{
+    u32 depth;
+    u32 nr;
+    u32 side;
+} output_values;
+
 void statistics(tree_node *block, pixel **image, output_values *output, u32 factor, u32 size)
 {
     u64 red = 0, green = 0, blue = 0, mean = 0;

@@ -4,7 +4,7 @@
 #include "tree_operations.h"
 
 void read_binary(FILE **in, char *name, cell_array *vector, u32 *size);
-void vector_to_tree(cell_array vector, tree_node **current, u32 size, u32 i, u32 depth);
+void vector_to_tree(cell_array vector, tree_node **current, u32 size, u32 i);
 pixel **generate_image(pixel **image, tree_node *current);
 void write_ppm(FILE **out, char *name, pixel **image, u32 size);
 
@@ -15,11 +15,6 @@ void read_binary(FILE **in, char *name, cell_array *vector, u32 *size)
         fprintf(stderr, "Error when reading from binary file!");
     }
     u32 i = vector->length;
-    // nr_current_depth reprezinta nr de noduri de pe nivelul curent.
-    // max_current_depth reprezinta nr total de noduri de pe un nivel,
-    // frunze sau interne.
-    u32 nr_current_depth = 0, max_current_depth = 1;
-    unsigned char depth = 0;
 
     if (fread(size, sizeof(u32), 1, *in) != 1)
     {
@@ -29,17 +24,6 @@ void read_binary(FILE **in, char *name, cell_array *vector, u32 *size)
 
     while (fread(&(vector->array[i].type), sizeof(unsigned char), 1, *in) == 1)
     {
-        // Cand s-au citit toate nodurile corespunzatoare unui nivel,
-        // se trece la nivelul urmator si nr_current_depth se reseteaza.
-        if (nr_current_depth >= max_current_depth)
-        {
-            ++depth;
-            nr_current_depth = 0;
-            max_current_depth *= 4;
-        }
-        ++nr_current_depth;
-        vector->array[i].depth = depth;
-
         if (vector->length >= vector->capacity)
         {
             vector->capacity *= 2;
@@ -74,15 +58,14 @@ void read_binary(FILE **in, char *name, cell_array *vector, u32 *size)
     }
 }
 
-void vector_to_tree(cell_array vector, tree_node **current, u32 size, u32 i, u32 depth)
+void vector_to_tree(cell_array vector, tree_node **current, u32 size, u32 i)
 {
     if (*current == NULL)
     {
         init_tree(current, size);
     }
     (*current)->type = vector.array[i].type;
-    (*current)->depth = depth;
-    if ((*current)->type==1)
+    if ((*current)->type == 1)
     {
         // Nodul e o frunza, retinem valorile RGB
         (*current)->red = vector.array[i].red;
@@ -93,7 +76,6 @@ void vector_to_tree(cell_array vector, tree_node **current, u32 size, u32 i, u32
     {
         generate_subtrees(*current);
 
-        ++depth;
         i = i * 4 + 1;
         if (i + 3 >= vector.length)
         {
@@ -120,10 +102,10 @@ void vector_to_tree(cell_array vector, tree_node **current, u32 size, u32 i, u32
         (*current)->bottom_left->green = vector.array[i + 3].green;
         (*current)->bottom_left->blue = vector.array[i + 3].blue;
 
-        vector_to_tree(vector, &((*current)->top_left), size / 2, i, depth);
-        vector_to_tree(vector, &((*current)->top_right), size / 2, i + 1, depth);
-        vector_to_tree(vector, &((*current)->bottom_right), size / 2, i + 2, depth);
-        vector_to_tree(vector, &((*current)->bottom_left), size / 2, i + 3, depth);
+        vector_to_tree(vector, &((*current)->top_left), size / 2, i);
+        vector_to_tree(vector, &((*current)->top_right), size / 2, i + 1);
+        vector_to_tree(vector, &((*current)->bottom_right), size / 2, i + 2);
+        vector_to_tree(vector, &((*current)->bottom_left), size / 2, i + 3);
     }
 }
 
