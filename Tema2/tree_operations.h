@@ -7,12 +7,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+typedef unsigned char u_char;
 typedef unsigned int u32;
 typedef unsigned long long u64;
 
 typedef struct pixel
 {
-    unsigned char red, green, blue;
+    u_char red, green, blue;
 } pixel;
 
 typedef struct point
@@ -29,41 +30,42 @@ struct tree_node
     tree_node *bottom_right;
     tree_node *bottom_left;
     // 0==>intern; 1==>frunza;
-    unsigned char type;
-    unsigned char depth;
-    unsigned char red;
-    unsigned char green;
-    unsigned char blue;
-    point corner_top_left;
-    point corner_bottom_right;
+    u_char type;
+    u_char depth;
+    u_char red;
+    u_char green;
+    u_char blue;
+    point corner_tl;
+    point corner_br;
 };
 
 // Valorile retinute in reprezentarea vectoriala a arborelui.
-typedef struct cell_data
+typedef struct data
 {
-    unsigned char type;
-    unsigned char depth;
-    unsigned char red;
-    unsigned char green;
-    unsigned char blue;
-} cell_data;
+    u_char type;
+    u_char depth;
+    u_char red;
+    u_char green;
+    u_char blue;
+} data;
 
 // Intreg vectorul prin care este reprezentat arborele.
 // length reprezinta nr de elemente retinute,
 // iar capacity memoria totala alocata.
-typedef struct cell_array
+typedef struct array
 {
-    cell_data *array;
+    data *array;
     u32 length;
-    u32 capacity;
-} cell_array;
+    u32 cap;
+} array;
 
 pixel **read_ppm(FILE **in, char *name, u32 *size);
 void init_tree(tree_node **root, u32 size);
 void init_leaf(tree_node **leaf, tree_node *parent);
 void generate_subtrees(tree_node *parent);
-void calculate_mean(tree_node *block, pixel **image, u32 size, u64 *red, u64 *green, u64 *blue, u64 *mean);
-void init_vector(cell_array *vector);
+void calculate_mean(tree_node *block, pixel **image, u32 size,
+                    u64 *R, u64 *G, u64 *B, u64 *mean);
+void init_vector(array *vector);
 void free_quadtree(tree_node *current);
 
 pixel **read_ppm(FILE **in, char *name, u32 *size)
@@ -124,10 +126,10 @@ void init_tree(tree_node **root, u32 size)
     *root = (tree_node *)malloc(sizeof(tree_node));
 
     (*root)->type = 1;
-    (*root)->corner_top_left.x = 0;
-    (*root)->corner_top_left.y = 0;
-    (*root)->corner_bottom_right.x = size - 1;
-    (*root)->corner_bottom_right.y = size - 1;
+    (*root)->corner_tl.x = 0;
+    (*root)->corner_tl.y = 0;
+    (*root)->corner_br.x = size - 1;
+    (*root)->corner_br.y = size - 1;
     (*root)->depth = 0;
     (*root)->top_left = NULL;
     (*root)->top_right = NULL;
@@ -151,10 +153,10 @@ void generate_subtrees(tree_node *parent)
 {
     // North-West si South-East
     point NW, SE, mid;
-    NW.x = parent->corner_top_left.x;
-    NW.y = parent->corner_top_left.y;
-    SE.x = parent->corner_bottom_right.x;
-    SE.y = parent->corner_bottom_right.y;
+    NW.x = parent->corner_tl.x;
+    NW.y = parent->corner_tl.y;
+    SE.x = parent->corner_br.x;
+    SE.y = parent->corner_br.y;
     mid.x = (NW.x + SE.x) / 2;
     mid.y = (NW.y + SE.y) / 2;
 
@@ -168,64 +170,65 @@ void generate_subtrees(tree_node *parent)
     parent->type = 0;
 
     // Subarborele din stanga sus:
-    parent->top_left->corner_top_left.x = NW.x;
-    parent->top_left->corner_top_left.y = NW.y;
-    parent->top_left->corner_bottom_right.x = mid.x;
-    parent->top_left->corner_bottom_right.y = mid.y;
+    parent->top_left->corner_tl.x = NW.x;
+    parent->top_left->corner_tl.y = NW.y;
+    parent->top_left->corner_br.x = mid.x;
+    parent->top_left->corner_br.y = mid.y;
 
     // Subarborele din dreapta sus:
-    parent->top_right->corner_top_left.x = mid.x + 1;
-    parent->top_right->corner_top_left.y = NW.y;
-    parent->top_right->corner_bottom_right.x = SE.x;
-    parent->top_right->corner_bottom_right.y = mid.y;
+    parent->top_right->corner_tl.x = mid.x + 1;
+    parent->top_right->corner_tl.y = NW.y;
+    parent->top_right->corner_br.x = SE.x;
+    parent->top_right->corner_br.y = mid.y;
 
     // Subarborele din dreapta jos:
-    parent->bottom_right->corner_top_left.x = mid.x + 1;
-    parent->bottom_right->corner_top_left.y = mid.y + 1;
-    parent->bottom_right->corner_bottom_right.x = SE.x;
-    parent->bottom_right->corner_bottom_right.y = SE.y;
+    parent->bottom_right->corner_tl.x = mid.x + 1;
+    parent->bottom_right->corner_tl.y = mid.y + 1;
+    parent->bottom_right->corner_br.x = SE.x;
+    parent->bottom_right->corner_br.y = SE.y;
 
     // Subarborele din stanga jos:
-    parent->bottom_left->corner_top_left.x = NW.x;
-    parent->bottom_left->corner_top_left.y = mid.y + 1;
-    parent->bottom_left->corner_bottom_right.x = mid.x;
-    parent->bottom_left->corner_bottom_right.y = SE.y;
+    parent->bottom_left->corner_tl.x = NW.x;
+    parent->bottom_left->corner_tl.y = mid.y + 1;
+    parent->bottom_left->corner_br.x = mid.x;
+    parent->bottom_left->corner_br.y = SE.y;
 }
 
-void calculate_mean(tree_node *current, pixel **image, u32 size, u64 *red, u64 *green, u64 *blue, u64 *mean)
+void calculate_mean(tree_node *current, pixel **image, u32 size,
+                    u64 *R, u64 *G, u64 *B, u64 *mean)
 {
     u32 i, j;
 
-    for (i = current->corner_top_left.x; i <= current->corner_bottom_right.x; ++i)
+    for (i = current->corner_tl.x; i <= current->corner_br.x; ++i)
     {
-        for (j = current->corner_top_left.y; j <= current->corner_bottom_right.y; ++j)
+        for (j = current->corner_tl.y; j <= current->corner_br.y; ++j)
         {
-            *red += image[j][i].red;
-            *green += image[j][i].green;
-            *blue += image[j][i].blue;
+            *R += image[j][i].red;
+            *G += image[j][i].green;
+            *B += image[j][i].blue;
         }
     }
-    *red /= size * size;
-    *green /= size * size;
-    *blue /= size * size;
+    *R /= size * size;
+    *G /= size * size;
+    *B /= size * size;
 
-    for (i = current->corner_top_left.x; i <= current->corner_bottom_right.x; ++i)
+    for (i = current->corner_tl.x; i <= current->corner_br.x; ++i)
     {
-        for (j = current->corner_top_left.y; j <= current->corner_bottom_right.y; ++j)
+        for (j = current->corner_tl.y; j <= current->corner_br.y; ++j)
         {
-            *mean += (*red - image[j][i].red) * (*red - image[j][i].red) +
-                     (*green - image[j][i].green) * (*green - image[j][i].green) +
-                     (*blue - image[j][i].blue) * (*blue - image[j][i].blue);
+            *mean += (*R - image[j][i].red) * (*R - image[j][i].red) +
+                     (*G - image[j][i].green) * (*G - image[j][i].green) +
+                     (*B - image[j][i].blue) * (*B - image[j][i].blue);
         }
     }
     *mean /= 3 * size * size;
 }
 
-void init_vector(cell_array *vector)
+void init_vector(array *vector)
 {
-    vector->array = (cell_data *)malloc(sizeof(cell_data));
+    vector->array = (data *)malloc(sizeof(data));
     vector->length = 0;
-    vector->capacity = 1;
+    vector->cap = 1;
 }
 
 void free_quadtree(tree_node *current)

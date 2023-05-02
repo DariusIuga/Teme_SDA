@@ -3,28 +3,30 @@
 
 #include "tree_operations.h"
 
-void add_cell(cell_array *vector, u64 red, u64 green, u64 blue, tree_node *block);
-void compression(tree_node *block, pixel **image, u32 factor, u32 size, cell_array *vector);
-void write_binary(FILE **out, char *name, cell_array vector, u32 size);
+void add_cell(array *vector, u64 red, u64 green, u64 blue, tree_node *block);
+void compression(tree_node *block, pixel **image,
+                 u32 factor, u32 size, array *vector);
+void write_binary(FILE **out, char *name, array vector, u32 size);
 int cmp_depth(const void *a, const void *b);
 
-void add_cell(cell_array *vector, u64 red, u64 green, u64 blue, tree_node *block)
+void add_cell(array *vector, u64 red, u64 green, u64 blue, tree_node *block)
 {
-    if (vector->length >= vector->capacity)
+    if (vector->length >= vector->cap)
     {
-        vector->capacity *= 2;
-        vector->array = (cell_data *)realloc(vector->array, vector->capacity * sizeof(cell_data));
+        vector->cap *= 2;
+        vector->array = (data *)
+            realloc(vector->array, vector->cap * sizeof(data));
     }
     u32 i = vector->length;
     vector->array[i].type = block->type;
 
     // Daca tipul nodului curent e 1 (frunza),
-    // stocam si valorile RGB
+    // retinem si valorile RGB
     if (vector->array[i].type)
     {
-        vector->array[i].red = (unsigned char)red;
-        vector->array[i].green = (unsigned char)green;
-        vector->array[i].blue = (unsigned char)blue;
+        vector->array[i].red = (u_char)red;
+        vector->array[i].green = (u_char)green;
+        vector->array[i].blue = (u_char)blue;
     }
     // Prin metoda reccursiva de parcurgere a vectorului,
     // elementele de pe acelasi nivel nu pot fi puse consecutiv in vector.
@@ -33,7 +35,8 @@ void add_cell(cell_array *vector, u64 red, u64 green, u64 blue, tree_node *block
     ++(vector->length);
 }
 
-void compression(tree_node *block, pixel **image, u32 factor, u32 size, cell_array *vector)
+void compression(tree_node *block, pixel **image,
+                 u32 factor, u32 size, array *vector)
 {
     u64 red = 0, green = 0, blue = 0, mean = 0;
     calculate_mean(block, image, size, &red, &green, &blue, &mean);
@@ -55,7 +58,7 @@ void compression(tree_node *block, pixel **image, u32 factor, u32 size, cell_arr
     }
 }
 
-void write_binary(FILE **out, char *name, cell_array vector, u32 size)
+void write_binary(FILE **out, char *name, array vector, u32 size)
 {
     if ((*out = fopen(name, "wb")) == NULL)
     {
@@ -65,21 +68,21 @@ void write_binary(FILE **out, char *name, cell_array vector, u32 size)
     fwrite(&size, sizeof(u32), 1, *out);
     for (i = 0; i < vector.length; ++i)
     {
-        fwrite(&(vector.array[i].type), sizeof(unsigned char), 1, *out);
+        fwrite(&(vector.array[i].type), sizeof(u_char), 1, *out);
         // Daca nodul e o frunza, scriem si valorile RGB
         if (vector.array[i].type)
         {
-            fwrite(&(vector.array[i].red), sizeof(unsigned char), 1, *out);
-            fwrite(&(vector.array[i].green), sizeof(unsigned char), 1, *out);
-            fwrite(&(vector.array[i].blue), sizeof(unsigned char), 1, *out);
+            fwrite(&(vector.array[i].red), sizeof(u_char), 1, *out);
+            fwrite(&(vector.array[i].green), sizeof(u_char), 1, *out);
+            fwrite(&(vector.array[i].blue), sizeof(u_char), 1, *out);
         }
     }
 }
 
 int cmp_depth(const void *a, const void *b)
 {
-    const cell_data *cell_a = (const cell_data *)a;
-    const cell_data *cell_b = (const cell_data *)b;
+    const data *cell_a = (const data *)a;
+    const data *cell_b = (const data *)b;
 
     return cell_a->depth - cell_b->depth;
 }

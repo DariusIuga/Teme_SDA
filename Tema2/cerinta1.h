@@ -4,14 +4,15 @@
 #include "tree_operations.h"
 
 // Vor fi scrise in fisierul text de output
-typedef struct output_values
+typedef struct output
 {
     u32 depth;
     u32 nr;
     u32 side;
-} output_values;
+} output;
 
-void statistics(tree_node *block, pixel **image, output_values *output, u32 factor, u32 size)
+void stats(tree_node *block, pixel **image,
+           output *output, u32 factor, u32 size)
 {
     u64 red = 0, green = 0, blue = 0, mean = 0;
     calculate_mean(block, image, size, &red, &green, &blue, &mean);
@@ -25,10 +26,10 @@ void statistics(tree_node *block, pixel **image, output_values *output, u32 fact
         // Acest bloc va fi divizat in 4 sub-blocuri
         generate_subtrees(block);
         size >>= 1;
-        statistics(block->top_left, image, output, factor, size);
-        statistics(block->top_right, image, output, factor, size);
-        statistics(block->bottom_right, image, output, factor, size);
-        statistics(block->bottom_left, image, output, factor, size);
+        stats(block->top_left, image, output, factor, size);
+        stats(block->top_right, image, output, factor, size);
+        stats(block->bottom_right, image, output, factor, size);
+        stats(block->bottom_left, image, output, factor, size);
     }
     else
     {
@@ -41,7 +42,7 @@ void statistics(tree_node *block, pixel **image, output_values *output, u32 fact
     }
 }
 
-void write_text(FILE **out, char *name, output_values output)
+void write_text(FILE **out, char *name, output output)
 {
     if ((*out = fopen(name, "wt")) == NULL)
     {

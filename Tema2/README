@@ -1,1 +1,55 @@
-// TODO
+***Tema 2 - Compresia imaginilor utilizand arbori ***
+
+
+
+Pe checkerul local am obtinut 54p din 80 pe teste si 8p bonus pe Valgrind
+
+
+Descriere implementare :
+
+
+1. Cerinta 1 : Valorile scrise in fisierul cu statisticile arborelui de compresie sunt retinute intr - o structura output.
+
+stats : Functia apeleaza functia calculate_mean pentru a calcula valorile medii pentru cele 3 culori si scorul similaritatii.Acest mean e folosit drept criteriu pentru apelurile recursive ale functiei : daca mean este mai mare ca toleranta data de factorul de compresie, se vor analiza cele 4 sferturi ale imaginii. Cele 3 valori de output sunt calculate pe parcursul functiei.
+
+write_text : Este folosita pentru a scrie datele de output in
+
+fisierul out cu numele dat in linia de comanda.
+
+
+
+
+2. Cerinta 2 :
+
+Am folosit o structura pentru a memora un vector si a retine lungimea sa curenta si capacitatea sa(memoria alocata).
+
+compression : Functia este similara cu cea folosita in prima cerinta.Dupa apelul catre calculate_mean,
+
+nodul curent este adaugat in vector prin functia add_cell. Daca mean este mai mare ca factorul dat, cei patru copii sunt generati prin generate_subtrees,
+
+iar functia curenta este apelata recursiv pentru fiecare dintre ei.
+
+add_cell : Rolul functiei este de a reprezenta toate nodurile din arborele cuaternar de compresie sub forma vectoriala.Pentru fiecare nod retin tipul sau, si daca este o frunza asignez si valorile RGB.Atunci cand ating capacitatea vectorului,
+
+memoria alocata este dublata prin realloc.Deoarece aceasta functie este apelata in cadrul unei functii recursive,
+
+nodurile din acelasi nivel nu pot fi parcurse consecutiv.Totusi, nodurile de pe acelasi nivel din arbore sunt reprezentate in ordine in vector.Pentru fiecare element citit in vector, retin si nivelul unui nod, iar vectorul poate fi sortat corect prin qsort pe baza nivelurilor.
+
+write_binary : Scriu dimensiunea imaginii, tipul nodurilor si valorile pentru culori in fisierul binar.out.
+
+
+
+3. Cerinta 3 : Folosesc aceeasi structura de la cerinta 2 pentru vector.
+
+read_binary : Aloca memorie si citeste date din fisierul binar.out in vector.
+
+vector_to_tree : Are scopul de a aloca memorie pentru arborele cuaternar si de a le da valori din vector: pentru frunze citesc valorile RGB, iar pentru noduri interne apelez recursiv functia.
+
+generate_image:
+		Pentru toate nodurile frunza scriu valorile RGB in zonele reprezentate de acestea. Pentru noduri interne apelez recursiv functia.
+
+
+
+write_ppm:
+
+	Scriu antetul si valorile RGB ale pixelilor din imaginea comprimata in fisierul binar .ppm.

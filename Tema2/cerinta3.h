@@ -3,12 +3,12 @@
 
 #include "tree_operations.h"
 
-void read_binary(FILE **in, char *name, cell_array *vector, u32 *size);
-void vector_to_tree(cell_array vector, tree_node **current, u32 size, u32 i);
+void read_binary(FILE **in, char *name, array *vector, u32 *size);
+void vector_to_tree(array vector, tree_node **current, u32 size, u32 i);
 pixel **generate_image(pixel **image, tree_node *current);
 void write_ppm(FILE **out, char *name, pixel **image, u32 size);
 
-void read_binary(FILE **in, char *name, cell_array *vector, u32 *size)
+void read_binary(FILE **in, char *name, array *vector, u32 *size)
 {
     if ((*in = fopen(name, "rb")) == NULL)
     {
@@ -22,34 +22,24 @@ void read_binary(FILE **in, char *name, cell_array *vector, u32 *size)
         return;
     }
 
-    while (fread(&(vector->array[i].type), sizeof(unsigned char), 1, *in)==1)
+    vector->array = (data *)malloc((*size * (*size)) * sizeof(data));
+    while (fread(&(vector->array[i].type), sizeof(u_char), 1, *in) == 1)
     {
-        if (vector->length >= vector->capacity)
-        {
-            vector->capacity *= 2;
-            vector->array = (cell_data *)realloc(vector->array, vector->capacity * sizeof(cell_data));
-            if (vector->array == NULL)
-            {
-                fprintf(stderr, "Error when reallocating memory!");
-                return;
-            }
-        }
-        // Daca nodul e o frunza, citim si valorile RGB
         if (vector->array[i].type == 1)
         {
-            if (fread(&(vector->array[i].red), sizeof(unsigned char), 1, *in) != 1)
+            if (fread(&(vector->array[i].red), sizeof(u_char), 1, *in) != 1)
             {
-                fprintf(stderr, "Error when reading red value from binary file!");
+                fprintf(stderr, "Error when reading R value from bin file!");
                 return;
             }
-            if (fread(&(vector->array[i].green), sizeof(unsigned char), 1, *in) != 1)
+            if (fread(&(vector->array[i].green), sizeof(u_char), 1, *in) != 1)
             {
-                fprintf(stderr, "Error when reading green value from binary file!");
+                fprintf(stderr, "Error when reading G value from bin file!");
                 return;
             }
-            if (fread(&(vector->array[i].blue), sizeof(unsigned char), 1, *in) != 1)
+            if (fread(&(vector->array[i].blue), sizeof(u_char), 1, *in) != 1)
             {
-                fprintf(stderr, "Error when reading blue value from binary file!");
+                fprintf(stderr, "Error when reading B value from bin file!");
                 return;
             }
         }
@@ -58,7 +48,7 @@ void read_binary(FILE **in, char *name, cell_array *vector, u32 *size)
     }
 }
 
-void vector_to_tree(cell_array vector, tree_node **current, u32 size, u32 i)
+void vector_to_tree(array vector, tree_node **current, u32 size, u32 i)
 {
     if (*current == NULL)
     {
@@ -115,9 +105,9 @@ pixel **generate_image(pixel **image, tree_node *current)
     if (current->type)
     {
         // Nodul curent e o frunza, coloram pixelii din zona asociata lui.
-        for (i = current->corner_top_left.y; i <= current->corner_bottom_right.y; ++i)
+        for (i = current->corner_tl.y; i <= current->corner_br.y; ++i)
         {
-            for (j = current->corner_top_left.x; j <= current->corner_bottom_right.x; ++j)
+            for (j = current->corner_tl.x; j <= current->corner_br.x; ++j)
             {
                 image[i][j].red = current->red;
                 image[i][j].green = current->green;
@@ -160,3 +150,4 @@ void write_ppm(FILE **out, char *name, pixel **image, u32 size)
 }
 
 #endif
+  

@@ -9,21 +9,6 @@ int main(int argc, char **argv)
     tree_node *root = NULL;
     FILE *in = NULL, *out = NULL;
 
-    // DEBUG MODE //
-
-    // Pentru cerintele 1 si 2:
-    // argc=5;
-    // argv[1] = "-c1";
-    // argv[2] = "0";
-    // argv[3] = "/home/darius/Documents/VS/C_C++/SDA/Teme/Tema_2/tests/input/test3.ppm";
-    // argv[4]= "quadtree.out";
-
-    // Pentru cerinta 3:
-    // argc = 4;
-    // argv[1] = "-d";
-    // argv[2] = "/home/darius/Documents/VS/C_C++/SDA/Teme/Tema_2/tests/input/test8_c2.out";
-    // argv[3] = "quadtree.out";
-
     if (argc == 5)
     {
         // Factorul de compresie
@@ -38,13 +23,13 @@ int main(int argc, char **argv)
             // Cerinta 1
 
             // output retine valorile scrise in fisierul text
-            output_values output;
+            output output;
             output.depth = 0;
             output.nr = 0;
             output.side = 0;
 
             // Analizam imaginea si arborele de compresie
-            statistics(root, image, &output, factor, size);
+            stats(root, image, &output, factor, size);
             // Scriem in fisierului aflat la path-ul dat sau cream unul nou
             write_text(&out, argv[4], output);
         }
@@ -54,7 +39,7 @@ int main(int argc, char **argv)
 
             // Reprezentarea sub forma liniara a arborelui,
             // care contine datele importante
-            cell_array vector;
+            array vector;
             init_vector(&vector);
             // Transformam arborele de compresie in vector
             compression(root, image, factor, size, &vector);
@@ -62,7 +47,7 @@ int main(int argc, char **argv)
             // Functia recursiva nu garanteaza ca nodurile de pe acelasi nivel
             // se vor afla alaturi in vector.
             // De aceea, vectorul trebuie sortat in functie de adancimea
-            qsort(vector.array, vector.length, sizeof(cell_data), cmp_depth);
+            qsort(vector.array, vector.length, sizeof(data), cmp_depth);
             write_binary(&out, argv[4], vector, size);
             free(vector.array);
         }
@@ -71,7 +56,7 @@ int main(int argc, char **argv)
     {
         // Cerinta 3
 
-        cell_array vector;
+        array vector;
         init_vector(&vector);
         // Citim dimensiunea imaginii si vectorul din fisierul binar
         read_binary(&in, argv[2], &vector, &size);

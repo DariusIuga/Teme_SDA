@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -g -O3
+CFLAGS = -std=gnu11 -Wall -Wextra -g -O3
 
 all: build
 
