@@ -53,10 +53,22 @@ int main(int argc, char **argv)
 
             read_edges(&in, names1, names2, costs, nr_edges);
 
-            graph.lists = (List *)malloc(nr_nodes * sizeof(List));
+            // graph.lists = (List *)malloc(nr_nodes * sizeof(List));
+            graph.lists = (Node **)malloc(nr_nodes * sizeof(Node *));
+
             graph = init_graph(graph, nr_nodes, nr_edges);
             graph = set_node_names(graph, names1, names2);
-            //graph = build_graph(graph, names1, names2, costs);
+            for (i = 0; i < nr_nodes; ++i)
+            {
+                printf("%s\n", graph.lists[i]->node_name);
+                printf("\n");
+            }
+            graph = build_graph(graph, names1, names2, costs);
+
+            for (i = 0; i < nr_nodes; ++i)
+            {
+                printf("%s %d\n", graph.lists[i]->node_name, graph.lists[i]->cost);
+            }
         }
         fclose(in);
     }

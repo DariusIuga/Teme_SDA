@@ -1,18 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// O lista inlantuita
 typedef struct node
 {
     char node_name[20];
     int cost;
     struct node *next;
-} Node, *List;
+} Node;
 
+// Reprezentarea grafului ponderat prin liste inlantuite
 typedef struct graph
 {
     int nr_nodes;
     int nr_edges;
-    List *lists;
+    Node **lists;
 } Graph;
 
 void read_edges(FILE **in, char **names1, char **names2, int *weights, int nr_edges)
@@ -34,7 +36,7 @@ Graph init_graph(Graph my_graph, int nr_nodes, int nr_edges)
     my_graph.nr_edges = nr_edges;
     for (i = 0; i < nr_nodes; ++i)
     {
-        my_graph.lists[i] = NULL;
+        my_graph.lists[i] = (Node *)malloc(sizeof(Node));
     }
 
     return my_graph;
@@ -42,50 +44,54 @@ Graph init_graph(Graph my_graph, int nr_nodes, int nr_edges)
 
 Graph set_node_names(Graph my_graph, char **names1, char **names2)
 {
-    int i, found = 0, j;
-    char new;
+    int i, found_names = 0, j;
+    char not_seen;
 
     // Parcurgem primul vector cu nume
     for (i = 0; i < my_graph.nr_edges; ++i)
     {
-        if (found == 0)
+        if (found_names == 0)
         {
-            strcpy(my_graph.lists[found]->node_name, names1[i]);
-            ++found;
+            strcpy(my_graph.lists[found_names]->node_name, names1[i]);
+            my_graph.lists[found_names]->cost=0;
+            ++found_names;
         }
         else
         {
-            new = 1;
-            for (j = 0; j < found; ++j)
+            not_seen = 1;
+            for (j = 0; j < found_names; ++j)
             {
                 if (strcmp(my_graph.lists[j]->node_name, names1[i]) == 0)
                 {
-                    new = 0;
+                    not_seen = 0;
                 }
             }
-            if (new == 1)
+            if (not_seen == 1)
             {
-                strcpy(my_graph.lists[found]->node_name, names1[i]);
-                ++found;
+                strcpy(my_graph.lists[found_names]->node_name, names1[i]);
+                my_graph.lists[found_names]->cost=0;
+                ++found_names;
             }
         }
     }
 
     // Parcurgem al doilea vector cu nume
+    // Pot fi noduri de gradul 1 care sunt legate de nodurile
+    // cu numele citite in primul vector
     for (i = 0; i < my_graph.nr_edges; ++i)
     {
-        new = 1;
-        for (j = 0; j < found; ++j)
+        not_seen = 1;
+        for (j = 0; j < found_names; ++j)
         {
             if (strcmp(my_graph.lists[j]->node_name, names2[i]) == 0)
             {
-                new = 0;
+                not_seen = 0;
             }
         }
-        if (new == 1)
+        if (not_seen == 1)
         {
-            strcpy(my_graph.lists[found]->node_name, names2[i]);
-            ++found;
+            strcpy(my_graph.lists[found_names]->node_name, names2[i]);
+            ++found_names;
         }
     }
 
@@ -94,7 +100,7 @@ Graph set_node_names(Graph my_graph, char **names1, char **names2)
 
 Graph insert_edge(Graph my_graph, char *name1, char *name2, int cost)
 {
-    List new = (List)malloc(sizeof(Node));
+    Node *new = (Node *)malloc(sizeof(Node));
     int i;
     strcpy(new->node_name, name2);
     new->cost = cost;
@@ -103,8 +109,7 @@ Graph insert_edge(Graph my_graph, char *name1, char *name2, int cost)
     {
         if (strcmp(my_graph.lists[i]->node_name, name1) == 0)
         {
-            new->next = my_graph.lists[i];
-            my_graph.lists[i] = new;
+            my_graph.lists[i]->next = new;
         }
     }
 
