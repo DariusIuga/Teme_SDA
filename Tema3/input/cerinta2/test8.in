@@ -1,0 +1,77 @@
+23 52
+Insula Nod_2 34
+Insula Nod_3 18
+Insula Nod_17 13
+Insula Nod_19 10
+Corabie Nod_3 14
+Corabie Nod_6 23
+Corabie Nod_12 10
+Nod_2 Insula 1
+Nod_2 Nod_4 9
+Nod_2 Nod_15 13
+Nod_2 Nod_16 9
+Nod_2 Nod_19 15
+Nod_3 Nod_5 4
+Nod_3 Nod_11 1
+Nod_3 Nod_13 9
+Nod_3 Nod_20 2
+Nod_4 Nod_5 2
+Nod_4 Nod_6 9
+Nod_5 Nod_6 13
+Nod_6 Nod_9 1
+Nod_6 Nod_12 12
+Nod_6 Nod_17 10
+Nod_6 Nod_22 7
+Nod_7 Nod_17 7
+Nod_8 Insula 2
+Nod_8 Corabie 3
+Nod_8 Nod_14 3
+Nod_8 Nod_18 4
+Nod_9 Nod_20 10
+Nod_10 Nod_12 5
+Nod_10 Nod_14 10
+Nod_10 Nod_17 1
+Nod_11 Nod_21 12
+Nod_12 Nod_14 7
+Nod_12 Nod_16 10
+Nod_12 Nod_19 5
+Nod_12 Nod_22 10
+Nod_12 Corabie 21
+Nod_14 Nod_2 15
+Nod_14 Nod_5 21
+Nod_14 Nod_15 30
+Nod_15 Nod_17 12
+Nod_15 Nod_19 11
+Nod_17 Insula 12
+Nod_17 Nod_18 26
+Nod_17 Nod_19 18
+Nod_17 Nod_20 14
+Nod_18 Nod_22 14
+Nod_19 Insula 20
+Nod_20 Nod_2 23
+Nod_22 Insula 32
+Nod_22 Corabie 23
+Insula 1
+Corabie 1
+Nod_2 16
+Nod_3 16
+Nod_4 31
+Nod_5 22
+Nod_6 40
+Nod_7 29
+Nod_8 30
+Nod_9 20
+Nod_10 36
+Nod_11 21
+Nod_12 13
+Nod_13 18
+Nod_14 17
+Nod_15 43
+Nod_16 34
+Nod_17 47
+Nod_18 31
+Nod_19 28
+Nod_20 42
+Nod_21 12
+Nod_22 31
+4030

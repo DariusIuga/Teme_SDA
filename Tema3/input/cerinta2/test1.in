@@ -1,0 +1,25 @@
+10 13
+Insula Nod_2 5
+Insula Nod_3 10
+Insula Nod_4 15
+Nod_3 Nod_2 2
+Nod_3 Nod_4 3
+Nod_3 Nod_5 20
+Nod_4 Nod_8 18
+Nod_4 Nod_9 13
+Nod_5 Nod_6 32
+Nod_6 Nod_7 8
+Nod_7 Corabie 12
+Nod_9 Corabie 15
+Corabie Insula 20
+Insula 1
+Corabie 1
+Nod_2 30
+Nod_3 20
+Nod_4 21
+Nod_5 3
+Nod_6 2
+Nod_7 1
+Nod_8 12
+Nod_9 30
+1200

@@ -1,0 +1,46 @@
+15 29
+Insula Nod_2 1
+Insula Nod_3 11
+Insula Nod_5 1
+Corabie Nod_2 13
+Corabie Nod_3 7
+Corabie Nod_5 1
+Corabie Nod_7 9
+Corabie Nod_10 12
+Corabie Nod_12 5
+Nod_2 Nod_3 11
+Nod_2 Nod_8 13
+Nod_2 Nod_11 3
+Nod_3 Nod_5 12
+Nod_4 Nod_5 10
+Nod_4 Nod_12 4
+Nod_5 Nod_8 4
+Nod_5 Nod_10 5
+Nod_5 Nod_11 7
+Nod_6 Nod_10 12
+Nod_7 Nod_8 11
+Nod_7 Nod_9 8
+Nod_7 Nod_11 3
+Nod_7 Nod_12 7
+Nod_8 Nod_11 3
+Nod_11 Insula 18
+Nod_11 Corabie 30
+Nod_11 Nod_12 5
+Nod_12 Nod_13 2
+Nod_13 Nod_14 30
+Insula 1
+Corabie 1
+Nod_2 32
+Nod_3 15
+Nod_4 10
+Nod_5 22
+Nod_6 40
+Nod_7 20
+Nod_8 32
+Nod_9 9
+Nod_10 30
+Nod_11 12
+Nod_12 19
+Nod_13 43
+Nod_14 22
+480
