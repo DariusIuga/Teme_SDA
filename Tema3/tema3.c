@@ -1,5 +1,6 @@
 #include "task1.h"
-#include "task2.h"
+
+void free_graph(Graph my_graph);
 
 int main(int argc, char **argv)
 {
@@ -9,8 +10,8 @@ int main(int argc, char **argv)
     int i;
 
     // DEBUG MODE
-    argc = 2;
-    argv[1] = "1";
+    //argc = 2;
+    //argv[1] = "1";
 
     if (argc == 1)
     {
@@ -18,75 +19,82 @@ int main(int argc, char **argv)
         exit(1);
     }
 
+    in = fopen("tema3.in", "rt");
+    if (in == NULL)
+    {
+        fprintf(stderr, "Error when reading from input file!\n");
+        exit(1);
+    }
+    out = fopen("tema3.out", "wt");
+    if (out == NULL)
+    {
+        fprintf(stderr, "Error when writing to output file!\n");
+        exit(1);
+    }
+
     if (strcmp(argv[1], "1") == 0)
     {
-        char **names1;
-        char **names2;
-        int *costs;
         int *min_costs;
         Graph graph;
 
-        in = fopen("tema3.in", "rt");
-        if (in == NULL)
+        if (fscanf(in, "%d", &nr_nodes) != 1)
         {
-            printf("Error when reading from input file!\n");
+            fprintf(stderr, "Error when reading nr of nodes!\n");
             exit(1);
         }
-        out = fopen("tema3.out", "wt");
-        if (out == NULL)
+        if (fscanf(in, "%d", &nr_edges) != 1)
         {
-            printf("Error when writing to output file!\n");
+            fprintf(stderr, "Error when reading nr of edges!\n");
             exit(1);
         }
-
-        fscanf(in, "%d", &nr_nodes);
-        fscanf(in, "%d", &nr_edges);
-        fgetc(in);
-        names1 = (char **)malloc(nr_edges * sizeof(char *));
-        for (i = 0; i < nr_edges; ++i)
-        {
-            names1[i] = (char *)malloc(20 * sizeof(char));
-        }
-        names2 = (char **)malloc(nr_edges * sizeof(char *));
-        for (i = 0; i < nr_edges; ++i)
-        {
-            names2[i] = (char *)malloc(20 * sizeof(char));
-        }
-        costs = (int *)malloc(nr_edges * sizeof(int));
+        char(*names1)[MAX_STRLEN] = (char(*)[MAX_STRLEN])malloc(nr_edges * sizeof(char[MAX_STRLEN]));
+        char(*names2)[MAX_STRLEN] = (char(*)[MAX_STRLEN])malloc(nr_edges * sizeof(char[MAX_STRLEN]));
+        int *costs = (int *)malloc(nr_edges * sizeof(int));
 
         read_edges(&in, names1, names2, costs, nr_edges);
 
+        // Initializarea grafului si alocarea memoriei pt vectorul de liste
         graph = init_graph(&graph, nr_nodes, nr_edges);
+        // Asocierea intre numele nodurilor si listele de adiacenta
         graph = set_node_names(graph, names1, names2);
-        for (i = 0; i < nr_nodes; ++i)
-        {
-            printf("%s\n", graph.lists[i]->node_name);
-            printf("\n");
-        }
+        // Adaugarea muchilor in liste
         graph = build_graph(graph, names1, names2, costs);
-        print_graph(graph);
 
-        int num_components = count_connected_components(graph);
-        Graph *components = find_connected_components(graph, num_components);
-        min_costs = (int *)malloc(num_components * sizeof(int));
-        for (i = 0; i < num_components; ++i)
+        free(names1);
+        names1 = NULL;
+        free(names2);
+        names2 = NULL;
+        free(costs);
+        costs = NULL;
+
+        int nr_components = count_connected_components(graph);
+        // components este un vector al componentelor conexe din graf
+        Graph *components = find_connected_components(graph, nr_components);
+        // Vector cu suma costurilor din MST pentru fiecare componenta
+        min_costs = (int *)malloc(nr_components * sizeof(int));
+        for (i = 0; i < nr_components; ++i)
         {
             min_costs[i] = calculate_mst_cost(components[i]);
         }
-        qsort(min_costs, num_components, sizeof(int), int_cmp);
+        // Costurile sunt sortate in ordine crescatoare
+        qsort(min_costs, nr_components, sizeof(int), int_cmp);
 
-        fprintf(out, "%d\n", num_components);
-        for (i = 0; i < num_components; ++i)
+        fprintf(out, "%d\n", nr_components);
+        for (i = 0; i < nr_components; ++i)
         {
             fprintf(out, "%d\n", min_costs[i]);
         }
 
-        fclose(in);
-        fclose(out);
+        free(min_costs);
+        min_costs = NULL;
+
+        // Eliberarea memoriei pentru grafuri
+        free_graph(graph);
+        free(components);
     }
     else if (strcmp(argv[1], "2") == 0)
     {
-        printf("Task 2\n");
+        // Cerinta 2
     }
     else
     {
@@ -94,5 +102,23 @@ int main(int argc, char **argv)
         exit(1);
     }
 
+    fclose(in);
+    fclose(out);
+
     return 0;
+}
+
+void free_graph(Graph my_graph)
+{
+    for (int i = 0; i < my_graph.nr_nodes; ++i)
+    {
+        Node *current = my_graph.lists[i];
+        while (current != NULL)
+        {
+            Node *next = current->next;
+            free(current);
+            current = next;
+        }
+    }
+    free(my_graph.lists);
 }
