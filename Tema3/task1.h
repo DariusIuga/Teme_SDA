@@ -21,16 +21,17 @@ typedef struct graph
 } Graph;
 
 void read_edges(FILE **in, char **names1, char **names2, int *weights, int nr_edges);
-Graph init_graph(Graph my_graph, int nr_nodes, int nr_edges);
+Graph init_graph(Graph *my_graph, int nr_nodes, int nr_edges);
 Graph set_node_names(Graph my_graph, char **names1, char **names2);
 int find_node_index(Graph my_graph, char *node_name);
 Graph insert_edge(Graph my_graph, char *name1, char *name2, int cost);
 Graph build_graph(Graph my_graph, char **names1, char **names2, int *costs);
 void print_graph(Graph my_graph);
 
-int DFS(Graph my_graph, int node_index, char *visited);
+int DFS(Graph my_graph, int node_index, char *visited, int *nr_edges);
 int count_connected_components(Graph my_graph);
-Graph *represent_connected_components(Graph my_graph, int *num_components);
+Graph *find_connected_components(Graph my_graph, int num_components);
+
 int calculate_mst_cost(Graph component);
 int int_cmp(const void *a, const void *b);
 
@@ -46,17 +47,18 @@ void read_edges(FILE **in, char **names1, char **names2, int *weights, int nr_ed
     }
 }
 
-Graph init_graph(Graph my_graph, int nr_nodes, int nr_edges)
+Graph init_graph(Graph *my_graph, int nr_nodes, int nr_edges)
 {
     int i;
-    my_graph.nr_nodes = nr_nodes;
-    my_graph.nr_edges = nr_edges;
+    my_graph->nr_nodes = nr_nodes;
+    my_graph->nr_edges = nr_edges;
+    my_graph->lists = (Node **)malloc(my_graph->nr_edges * sizeof(Node *));
     for (i = 0; i < nr_nodes; ++i)
     {
-        my_graph.lists[i] = (Node *)malloc(sizeof(Node));
+        my_graph->lists[i] = (Node *)malloc(sizeof(Node));
     }
 
-    return my_graph;
+    return *my_graph;
 }
 
 Graph set_node_names(Graph my_graph, char **names1, char **names2)
@@ -181,13 +183,14 @@ void print_graph(Graph my_graph)
             printf("%s ", current->node_name);
             printf("%d ", current->cost);
         }
-        printf("\n");
+        printf("\n\n");
     }
 }
 
-int DFS(Graph my_graph, int node_index, char *visited)
+int DFS(Graph my_graph, int node_index, char *visited, int *nr_edges)
 {
     visited[node_index] = 1;
+
     int count = 1;
 
     Node *current = my_graph.lists[node_index]->next;
@@ -195,8 +198,11 @@ int DFS(Graph my_graph, int node_index, char *visited)
     {
         int neighbor_index = find_node_index(my_graph, current->node_name);
         if (visited[neighbor_index] == 0)
-            count += DFS(my_graph, neighbor_index, visited);
+        {
+            count += DFS(my_graph, neighbor_index, visited, nr_edges);
+        }
         current = current->next;
+        ++(*nr_edges);
     }
 
     return count;
@@ -204,6 +210,7 @@ int DFS(Graph my_graph, int node_index, char *visited)
 
 int count_connected_components(Graph my_graph)
 {
+    int nr_edges = 0;
     char *visited = (char *)malloc(my_graph.nr_nodes * sizeof(char));
     for (int i = 0; i < my_graph.nr_nodes; ++i)
     {
@@ -215,7 +222,7 @@ int count_connected_components(Graph my_graph)
     {
         if (visited[i] == 0)
         {
-            int component_size = DFS(my_graph, i, visited);
+            int component_size = DFS(my_graph, i, visited, &nr_edges);
             if (component_size > 0)
             {
                 ++count;
@@ -223,83 +230,85 @@ int count_connected_components(Graph my_graph)
         }
     }
 
-    free(visited);
+    //free(visited);
     return count;
 }
 
-Graph *represent_connected_components(Graph my_graph, int *num_components)
+Graph *find_connected_components(Graph my_graph, int num_components)
 {
     char *visited = (char *)malloc(my_graph.nr_nodes * sizeof(char));
-    for (int i = 0; i < my_graph.nr_nodes; ++i)
-        visited[i] = 0;
-
-    *num_components = count_connected_components(my_graph);
-
-    Graph *components = (Graph *)malloc((*num_components) * sizeof(Graph));
-    for (int i = 0; i < *num_components; ++i)
+    int i, j, k;
+    // int node_index;
+    int component_size = 0;
+    for (i = 0; i < my_graph.nr_nodes; ++i)
     {
-        components[i].nr_nodes = 0;
-        components[i].nr_edges = 0;
-        components[i].lists = (Node **)malloc(my_graph.nr_nodes * sizeof(Node *));
-        for (int j = 0; j < my_graph.nr_nodes; ++j)
-            components[i].lists[j] = NULL;
+        visited[i] = 0;
     }
 
-    int component_index = 0;
-    for (int i = 0; i < my_graph.nr_nodes; ++i)
+    Graph *components = (Graph *)malloc(num_components * sizeof(Graph));
+
+    for (i = 0; i < num_components; ++i)
     {
-        if (visited[i] == 0)
+        // Gasim indexii din componenta respectiva, nr de noduri si muchii
+        int nr_edges = 0;
+        // Node *temp = (Node *)malloc(sizeof(Node));
+
+        for (j = 0; j < my_graph.nr_nodes; ++j)
         {
-            int component_size = DFS(my_graph, i, visited);
-            if (component_size > 0)
+            if (visited[j] == 0)
             {
-                components[component_index].nr_nodes = component_size;
-                components[component_index].lists = (Node **)malloc(component_size * sizeof(Node *));
-                for (int j = 0; j < component_size; ++j)
-                    components[component_index].lists[j] = NULL;
+                component_size = DFS(my_graph, j, visited, &nr_edges);
+                nr_edges /= 2;
+                break;
+            }
+        }
+        init_graph(&components[i], component_size, nr_edges);
+        k = 0;
+        for (j = 0; j < my_graph.nr_nodes; ++j)
+        {
+            // Avem 3 cazuri:
+            // 1) visited[j] == 0 => Nodul nu a fost vizitat.
+            // 2) visited[j] == 1 => Nodul a fost vizitat
+            // si va fi adaugat in componenta curenta.
+            // 2) visited[j] == 2 => Nodul a fost vizitat dar
+            // a fost deja adaugat intr-o alta componenta.
 
-                int node_index = 0;
-                for (int j = 0; j < my_graph.nr_nodes; ++j)
-                {
-                    if (visited[j] == 1)
-                    {
-                        components[component_index].lists[node_index] = (Node *)malloc(sizeof(Node));
-                        strcpy(components[component_index].lists[node_index]->node_name, my_graph.lists[j]->node_name);
-                        components[component_index].lists[node_index]->cost = my_graph.lists[j]->cost;
-                        ++node_index;
-                    }
-                }
-
-                ++component_index;
+            if (visited[j] == 1)
+            {
+                components[i].lists[k] = my_graph.lists[j];
+                ++visited[j];
+                ++k;
             }
         }
     }
 
-    free(visited);
+    //free(visited);
     return components;
 }
 
 int calculate_mst_cost(Graph component)
 {
     int total_cost = 0;
+    int i;
 
-    // Create a visited array to track visited nodes
     int *visited = (int *)malloc(component.nr_nodes * sizeof(int));
-    for (int i = 0; i < component.nr_nodes; ++i)
+    for (i = 0; i < component.nr_nodes; ++i)
+    {
         visited[i] = 0;
+    }
 
-    // Select the starting node as the first node in the component
-    int start_node = 0;
-    visited[start_node] = 1;
+    // Nodul din care incepem cautarea va fi primul
+    visited[0] = 1;
 
-    // Repeat until all nodes are visited
+    // Cautarea se repeta pana cand toate nodurile au fost vizitate
     while (1)
     {
         int min_cost = MAX_COST;
         int min_cost_node = -1;
 
-        // Find the minimum cost edge connecting a visited node to an unvisited node
-        for (int i = 0; i < component.nr_nodes; ++i)
+        // Gaseste muchia de cost minim care conecteaza un nod vizitat
+        // de unul nevizitat
+        for (i = 0; i < component.nr_nodes; ++i)
         {
             if (visited[i] == 1)
             {
@@ -317,17 +326,17 @@ int calculate_mst_cost(Graph component)
             }
         }
 
-        // If no minimum cost edge is found, the MST is complete
+        // Daca nu se mai gasesc muchii de cost minim, algoritmul e gata.
         if (min_cost_node == -1)
+        {
             break;
+        }
 
-        // Add the minimum cost edge to the MST and mark the node as visited
+        // Adauga muchia de cost minim in MST
+        // si marcheaza nodul drept vizitat.
         total_cost += min_cost;
         visited[min_cost_node] = 1;
     }
-
-    // Cleanup: free memory allocated for the visited array
-    free(visited);
 
     return total_cost;
 }

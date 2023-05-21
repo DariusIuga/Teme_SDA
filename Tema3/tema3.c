@@ -56,10 +56,7 @@ int main(int argc, char **argv)
 
         read_edges(&in, names1, names2, costs, nr_edges);
 
-        // graph.lists = (List *)malloc(nr_nodes * sizeof(List));
-        graph.lists = (Node **)malloc(nr_nodes * sizeof(Node *));
-
-        graph = init_graph(graph, nr_nodes, nr_edges);
+        graph = init_graph(&graph, nr_nodes, nr_edges);
         graph = set_node_names(graph, names1, names2);
         for (i = 0; i < nr_nodes; ++i)
         {
@@ -69,8 +66,8 @@ int main(int argc, char **argv)
         graph = build_graph(graph, names1, names2, costs);
         print_graph(graph);
 
-        int num_components;
-        Graph *components = represent_connected_components(graph, &num_components);
+        int num_components = count_connected_components(graph);
+        Graph *components = find_connected_components(graph, num_components);
         min_costs = (int *)malloc(num_components * sizeof(int));
         for (i = 0; i < num_components; ++i)
         {
