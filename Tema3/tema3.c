@@ -23,6 +23,7 @@ int main(int argc, char **argv)
         char **names1;
         char **names2;
         int *costs;
+        int *min_costs;
         Graph graph;
 
         in = fopen("tema3.in", "rt");
@@ -37,45 +38,54 @@ int main(int argc, char **argv)
             printf("Error when writing to output file!\n");
             exit(1);
         }
-        else
+
+        fscanf(in, "%d", &nr_nodes);
+        fscanf(in, "%d", &nr_edges);
+        fgetc(in);
+        names1 = (char **)malloc(nr_edges * sizeof(char *));
+        for (i = 0; i < nr_edges; ++i)
         {
-            fscanf(in, "%d", &nr_nodes);
-            fscanf(in, "%d", &nr_edges);
-            fgetc(in);
-            names1 = (char **)malloc(nr_edges * sizeof(char *));
-            for (i = 0; i < nr_edges; ++i)
-            {
-                names1[i] = (char *)malloc(20 * sizeof(char));
-            }
-            names2 = (char **)malloc(nr_edges * sizeof(char *));
-            for (i = 0; i < nr_edges; ++i)
-            {
-                names2[i] = (char *)malloc(20 * sizeof(char));
-            }
-            costs = (int *)malloc(nr_edges * sizeof(int));
+            names1[i] = (char *)malloc(20 * sizeof(char));
+        }
+        names2 = (char **)malloc(nr_edges * sizeof(char *));
+        for (i = 0; i < nr_edges; ++i)
+        {
+            names2[i] = (char *)malloc(20 * sizeof(char));
+        }
+        costs = (int *)malloc(nr_edges * sizeof(int));
 
-            read_edges(&in, names1, names2, costs, nr_edges);
+        read_edges(&in, names1, names2, costs, nr_edges);
 
-            // graph.lists = (List *)malloc(nr_nodes * sizeof(List));
-            graph.lists = (Node **)malloc(nr_nodes * sizeof(Node *));
+        // graph.lists = (List *)malloc(nr_nodes * sizeof(List));
+        graph.lists = (Node **)malloc(nr_nodes * sizeof(Node *));
 
-            graph = init_graph(graph, nr_nodes, nr_edges);
-            graph = set_node_names(graph, names1, names2);
-            for (i = 0; i < nr_nodes; ++i)
-            {
-                printf("%s\n", graph.lists[i]->node_name);
-                printf("\n");
-            }
-            graph = build_graph(graph, names1, names2, costs);
-            print_graph(graph);
+        graph = init_graph(graph, nr_nodes, nr_edges);
+        graph = set_node_names(graph, names1, names2);
+        for (i = 0; i < nr_nodes; ++i)
+        {
+            printf("%s\n", graph.lists[i]->node_name);
+            printf("\n");
+        }
+        graph = build_graph(graph, names1, names2, costs);
+        print_graph(graph);
 
-            int num_components;
-            Graph *components = represent_connected_components(graph, &num_components);
+        int num_components;
+        Graph *components = represent_connected_components(graph, &num_components);
+        min_costs = (int *)malloc(num_components * sizeof(int));
+        for (i = 0; i < num_components; ++i)
+        {
+            min_costs[i] = calculate_mst_cost(components[i]);
+        }
+        qsort(min_costs, num_components, sizeof(int), int_cmp);
 
-            fprintf(out, "%d", num_components);
+        fprintf(out, "%d\n", num_components);
+        for (i = 0; i < num_components; ++i)
+        {
+            fprintf(out, "%d\n", min_costs[i]);
         }
 
         fclose(in);
+        fclose(out);
     }
     else if (strcmp(argv[1], "2") == 0)
     {

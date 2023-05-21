@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define MAX_COST 1000000
+
 // O lista inlantuita
 typedef struct node
 {
@@ -26,9 +28,11 @@ Graph insert_edge(Graph my_graph, char *name1, char *name2, int cost);
 Graph build_graph(Graph my_graph, char **names1, char **names2, int *costs);
 void print_graph(Graph my_graph);
 
-int DFS(Graph my_graph, int node_index, int *visited);
+int DFS(Graph my_graph, int node_index, char *visited);
 int count_connected_components(Graph my_graph);
 Graph *represent_connected_components(Graph my_graph, int *num_components);
+int calculate_mst_cost(Graph component);
+int int_cmp(const void *a, const void *b);
 
 void read_edges(FILE **in, char **names1, char **names2, int *weights, int nr_edges)
 {
@@ -181,7 +185,7 @@ void print_graph(Graph my_graph)
     }
 }
 
-int DFS(Graph my_graph, int node_index, int *visited)
+int DFS(Graph my_graph, int node_index, char *visited)
 {
     visited[node_index] = 1;
     int count = 1;
@@ -200,7 +204,7 @@ int DFS(Graph my_graph, int node_index, int *visited)
 
 int count_connected_components(Graph my_graph)
 {
-    int *visited = (int *)malloc(my_graph.nr_nodes * sizeof(int));
+    char *visited = (char *)malloc(my_graph.nr_nodes * sizeof(char));
     for (int i = 0; i < my_graph.nr_nodes; ++i)
     {
         visited[i] = 0;
@@ -225,7 +229,7 @@ int count_connected_components(Graph my_graph)
 
 Graph *represent_connected_components(Graph my_graph, int *num_components)
 {
-    int *visited = (int *)malloc(my_graph.nr_nodes * sizeof(int));
+    char *visited = (char *)malloc(my_graph.nr_nodes * sizeof(char));
     for (int i = 0; i < my_graph.nr_nodes; ++i)
         visited[i] = 0;
 
@@ -273,4 +277,64 @@ Graph *represent_connected_components(Graph my_graph, int *num_components)
 
     free(visited);
     return components;
+}
+
+int calculate_mst_cost(Graph component)
+{
+    int total_cost = 0;
+
+    // Create a visited array to track visited nodes
+    int *visited = (int *)malloc(component.nr_nodes * sizeof(int));
+    for (int i = 0; i < component.nr_nodes; ++i)
+        visited[i] = 0;
+
+    // Select the starting node as the first node in the component
+    int start_node = 0;
+    visited[start_node] = 1;
+
+    // Repeat until all nodes are visited
+    while (1)
+    {
+        int min_cost = MAX_COST;
+        int min_cost_node = -1;
+
+        // Find the minimum cost edge connecting a visited node to an unvisited node
+        for (int i = 0; i < component.nr_nodes; ++i)
+        {
+            if (visited[i] == 1)
+            {
+                Node *current = component.lists[i]->next;
+                while (current != NULL)
+                {
+                    int neighbor_index = find_node_index(component, current->node_name);
+                    if (visited[neighbor_index] == 0 && current->cost < min_cost)
+                    {
+                        min_cost = current->cost;
+                        min_cost_node = neighbor_index;
+                    }
+                    current = current->next;
+                }
+            }
+        }
+
+        // If no minimum cost edge is found, the MST is complete
+        if (min_cost_node == -1)
+            break;
+
+        // Add the minimum cost edge to the MST and mark the node as visited
+        total_cost += min_cost;
+        visited[min_cost_node] = 1;
+    }
+
+    // Cleanup: free memory allocated for the visited array
+    free(visited);
+
+    return total_cost;
+}
+
+int int_cmp(const void *a, const void *b)
+{
+    int x = *(int *)a;
+    int y = *(int *)b;
+    return x - y;
 }
