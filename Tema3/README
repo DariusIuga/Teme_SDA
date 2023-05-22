@@ -1,0 +1,59 @@
+				Tema 3 – Grafuri
+				
+	Pe checkerul local am obtinut 60p/100.
+				
+	Cerinta 1- detalii implementare:
+	
+	Un graf este reprezentat printr-o structura ce contine numarul de noduri
+si de muchii si un vector de liste inlantuite (liste de adiacenta).
+	O lista de adiacenta are drept prim element/cap un nod din graf, urmat de
+vecinii nodului respectiv. Acestia sunt identificati printr-un nume si prin
+costul muchiei dintre ei si nodul din cap.
+
+	- read_edges:
+	Citeste valori din "tema3.in" in 2 vectori cu numele nodurilor din 
+capetele muchiilor si intr-un vector cu ponderile muchiilor.
+
+	-init_graph:
+	Initializeaza campurile nr_nodes si nr_edges si aloca memorie pentru
+vectorul de liste si pentru capetele de lista.
+
+	-set_node_names:
+	Parcurge cei 2 vectori cu nume astfel incat capetele listelor sa contina
+in mod unic fiecare nume din ei. La final avem cate o lista de adiacenta
+pentru fiecare nod.
+
+	-find_node_index:
+	Nu am folosit vreo codificare pentru numele nodurilor, deci trebuie sa
+parcurg capetele listelor daca vreau sa gasesc indexul unui nod.
+
+	-insert_edge:
+	Adauga un nod cu numele y si un cost dat in lista de adiacenta 
+a nodului cu numele x.
+
+	-build_graph:
+	Adauga fiecare muchie din graf pornind de la vectorii cu nume si cel cu
+ponderile.
+
+	-DFS:
+	Porneste de la un nod dat si apeleaza recursiv functia pentru un vecin
+nevizitat de-al sau. Vecinii vizitati sunt marcati in vectorul visited.
+Retine si dublul nr de muchii din graful conex.
+
+	-count_connected_components:
+	Dupa apelul lui DFS, toate nodurile care apartin unei componente conexe 
+sunt marcate. Astfel, putem gasi nr de componente conexe din graful initial.
+
+	-find_connected_components:
+	Componentele conexe sunt reprezentate ca un vector de grafuri.
+Gasim nr de noduri din componenta curenta prin DFS, o initializam, apoi
+listele de adiacenta ale componentei vor pointa catre nodurile vizitate
+in ultimul apel al DFS.
+
+	-calculate_mst_cost:
+	Foloseste algoritmul lui Prim pentru a gasi arborele minim de acoperire
+pentru o componenta, apoi calculeaza suma costurilor muchiilor din MST.
+	Vectorul cu sumele costurilor va fi sortat prin qsort.
+										
+																					
+																					

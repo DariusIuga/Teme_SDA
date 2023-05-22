@@ -36,7 +36,7 @@ Graph *find_connected_components(Graph my_graph, int num_components);
 
 // Subpunctul b
 int calculate_mst_cost(Graph component);
-int int_cmp(const void *a, const void *b);
+int cmp_int(const void *a, const void *b);
 
 void read_edges(FILE **in, char names1[][MAX_STRLEN], char names2[][MAX_STRLEN], int *weights, int nr_edges)
 {
@@ -199,6 +199,8 @@ void print_graph(Graph my_graph)
     }
 }
 
+// Returneaza nr de noduri din componenta conexa
+// in care se afla nodul initial
 int DFS(Graph my_graph, int node_index, char *visited, int *nr_edges)
 {
     visited[node_index] = 1;
@@ -234,11 +236,8 @@ int count_connected_components(Graph my_graph)
     {
         if (visited[i] == 0)
         {
-            int component_size = DFS(my_graph, i, visited, &nr_edges);
-            if (component_size > 0)
-            {
-                ++count;
-            }
+            DFS(my_graph, i, visited, &nr_edges);
+            ++count;
         }
     }
 
@@ -250,7 +249,7 @@ int count_connected_components(Graph my_graph)
     return count;
 }
 
-Graph *find_connected_components(Graph my_graph, int num_components)
+Graph *find_connected_components(Graph my_graph, int nr_components)
 {
     char *visited = (char *)malloc(my_graph.nr_nodes * sizeof(char));
     int i, j, k;
@@ -261,9 +260,9 @@ Graph *find_connected_components(Graph my_graph, int num_components)
         visited[i] = 0;
     }
 
-    Graph *components = (Graph *)malloc(num_components * sizeof(Graph));
+    Graph *components = (Graph *)malloc(nr_components * sizeof(Graph));
 
-    for (i = 0; i < num_components; ++i)
+    for (i = 0; i < nr_components; ++i)
     {
         // Gasim indexii din componenta respectiva, nr de noduri si muchii
         int nr_edges = 0;
@@ -278,7 +277,12 @@ Graph *find_connected_components(Graph my_graph, int num_components)
                 break;
             }
         }
-        init_graph(&components[i], component_size, nr_edges);
+
+        // Intializam componenta i
+        components[i].nr_nodes = component_size;
+        components[i].nr_edges = nr_edges;
+        components[i].lists = (Node **)malloc(my_graph.nr_edges * sizeof(Node *));
+
         k = 0;
         for (j = 0; j < my_graph.nr_nodes; ++j)
         {
@@ -366,7 +370,8 @@ int calculate_mst_cost(Graph component)
     return total_cost;
 }
 
-int int_cmp(const void *a, const void *b)
+// Furnizata ca parametru lui qsort pentru a compara costurile drumurilor
+int cmp_int(const void *a, const void *b)
 {
     int x = *(int *)a;
     int y = *(int *)b;

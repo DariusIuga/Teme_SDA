@@ -10,8 +10,8 @@ int main(int argc, char **argv)
     int i;
 
     // DEBUG MODE
-    //argc = 2;
-    //argv[1] = "1";
+    argc = 2;
+    argv[1] = "1";
 
     if (argc == 1)
     {
@@ -77,7 +77,7 @@ int main(int argc, char **argv)
             min_costs[i] = calculate_mst_cost(components[i]);
         }
         // Costurile sunt sortate in ordine crescatoare
-        qsort(min_costs, nr_components, sizeof(int), int_cmp);
+        qsort(min_costs, nr_components, sizeof(int), cmp_int);
 
         fprintf(out, "%d\n", nr_components);
         for (i = 0; i < nr_components; ++i)
@@ -90,6 +90,10 @@ int main(int argc, char **argv)
 
         // Eliberarea memoriei pentru grafuri
         free_graph(graph);
+        for (i = 0; i < nr_components; ++i)
+        {
+            free(components[i].lists);
+        }
         free(components);
     }
     else if (strcmp(argv[1], "2") == 0)
