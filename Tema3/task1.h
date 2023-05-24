@@ -21,12 +21,21 @@ typedef struct graph
     Node **lists;
 } Graph;
 
-void read_edges(FILE **in, char names1[][MAX_STRLEN], char names2[][MAX_STRLEN], int *weights, int nr_edges);
+void read_edges(FILE **in, char names1[][MAX_STRLEN],
+                char names2[][MAX_STRLEN], int *weights, int nr_edges);
+
 Graph init_graph(Graph *my_graph, int nr_nodes, int nr_edges);
-Graph set_node_names(Graph my_graph, char names1[][MAX_STRLEN], char names2[][MAX_STRLEN]);
+
+Graph set_node_names(Graph my_graph, char names1[][MAX_STRLEN],
+                     char names2[][MAX_STRLEN]);
+
 int find_node_index(Graph my_graph, char *node_name);
+
 Graph insert_edge(Graph my_graph, char *name1, char *name2, int cost);
-Graph build_graph(Graph my_graph, char names1[][MAX_STRLEN], char names2[][MAX_STRLEN], int *costs);
+
+Graph build_graph(Graph my_graph, char names1[][MAX_STRLEN],
+                  char names2[][MAX_STRLEN], int *costs);
+
 void print_graph(Graph my_graph);
 
 // Subpunctul a
@@ -38,7 +47,8 @@ Graph *find_connected_components(Graph my_graph, int num_components);
 int calculate_mst_cost(Graph component);
 int cmp_int(const void *a, const void *b);
 
-void read_edges(FILE **in, char names1[][MAX_STRLEN], char names2[][MAX_STRLEN], int *weights, int nr_edges)
+void read_edges(FILE **in, char names1[][MAX_STRLEN],
+                char names2[][MAX_STRLEN], int *weights, int nr_edges)
 {
     int i;
     for (i = 0; i < nr_edges; ++i)
@@ -69,12 +79,14 @@ Graph init_graph(Graph *my_graph, int nr_nodes, int nr_edges)
     for (i = 0; i < nr_nodes; ++i)
     {
         my_graph->lists[i] = (Node *)malloc(sizeof(Node));
+        my_graph->lists[i]->next = NULL;
     }
 
     return *my_graph;
 }
 
-Graph set_node_names(Graph my_graph, char names1[][MAX_STRLEN], char names2[][MAX_STRLEN])
+Graph set_node_names(Graph my_graph, char names1[][MAX_STRLEN],
+                     char names2[][MAX_STRLEN])
 {
     int i, found_names = 0, j;
     char not_seen;
@@ -162,7 +174,8 @@ Graph insert_edge(Graph my_graph, char *name1, char *name2, int cost)
     return my_graph;
 }
 
-Graph build_graph(Graph my_graph, char names1[][MAX_STRLEN], char names2[][MAX_STRLEN], int *costs)
+Graph build_graph(Graph my_graph, char names1[][MAX_STRLEN],
+                  char names2[][MAX_STRLEN], int *costs)
 {
     int i;
     for (i = 0; i < my_graph.nr_edges; ++i)
@@ -281,7 +294,8 @@ Graph *find_connected_components(Graph my_graph, int nr_components)
         // Intializam componenta i
         components[i].nr_nodes = component_size;
         components[i].nr_edges = nr_edges;
-        components[i].lists = (Node **)malloc(my_graph.nr_edges * sizeof(Node *));
+        components[i].lists = (Node **)
+            malloc(my_graph.nr_edges * sizeof(Node *));
 
         k = 0;
         for (j = 0; j < my_graph.nr_nodes; ++j)
@@ -339,8 +353,10 @@ int calculate_mst_cost(Graph component)
                 Node *current = component.lists[i]->next;
                 while (current != NULL)
                 {
-                    int neighbor_index = find_node_index(component, current->node_name);
-                    if (visited[neighbor_index] == 0 && current->cost < min_cost)
+                    int neighbor_index =
+                        find_node_index(component, current->node_name);
+                    if (visited[neighbor_index] == 0 &&
+                        current->cost < min_cost)
                     {
                         min_cost = current->cost;
                         min_cost_node = neighbor_index;

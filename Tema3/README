@@ -1,9 +1,9 @@
 				Tema 3 – Grafuri
-
-	Pe checkerul local am obtinut 60p/100.
-
+				
+	Pe checkerul local am obtinut 88p/100 si bonusul pe Valgrind.
+				
 	Cerinta 1- detalii implementare:
-
+	
 	Un graf este reprezentat printr-o structura ce contine numarul de noduri
 si de muchii si un vector de liste inlantuite (liste de adiacenta).
 	O lista de adiacenta are drept prim element/cap un nod din graf, urmat de
@@ -11,7 +11,7 @@ vecinii nodului respectiv. Acestia sunt identificati printr-un nume si prin
 costul muchiei dintre ei si nodul din cap.
 
 	- read_edges:
-	Citeste valori din "tema3.in" in 2 vectori cu numele nodurilor din
+	Citeste valori din "tema3.in" in 2 vectori cu numele nodurilor din 
 capetele muchiilor si intr-un vector cu ponderile muchiilor.
 
 	-init_graph:
@@ -28,7 +28,7 @@ pentru fiecare nod.
 parcurg capetele listelor daca vreau sa gasesc indexul unui nod.
 
 	-insert_edge:
-	Adauga un nod cu numele y si un cost dat in lista de adiacenta
+	Adauga un nod cu numele y si un cost dat in lista de adiacenta 
 a nodului cu numele x.
 
 	-build_graph:
@@ -41,7 +41,7 @@ nevizitat de-al sau. Vecinii vizitati sunt marcati in vectorul visited.
 Retine si dublul nr de muchii din graful conex.
 
 	-count_connected_components:
-	Dupa apelul lui DFS, toate nodurile care apartin unei componente conexe
+	Dupa apelul lui DFS, toate nodurile care apartin unei componente conexe 
 sunt marcate. Astfel, putem gasi nr de componente conexe din graful initial.
 
 	-find_connected_components:
@@ -54,6 +54,73 @@ in ultimul apel al DFS.
 	Foloseste algoritmul lui Prim pentru a gasi arborele minim de acoperire
 pentru o componenta, apoi calculeaza suma costurilor muchiilor din MST.
 	Vectorul cu sumele costurilor va fi sortat prin qsort.
+				
+				
+	Cerinta 1- detalii implementare:	
+	
+	-read_map: Fata de cerinta 1, am mai multe date de citit. Folosesc un al
+treilea vector cu nume pentru a retine in mod unic numele nodurilor din
+capetele listelor de adiacenta.
 
+	Functiile de initializare si construire a grafului orientat sunt adaptate
+pornind de la cele pentru graful neorientat din cerinta 1.
 
+	-Dijkstra: 
+	
+	Functia implementeaza algoritmul lui Dijkstra pentru a gasi cea mai scurta
+cale intr-un graf orientat. Algoritmul incepe prin initializarea 
+distantelor nodurilor cu o valoare mare, setarea nodului sursa cu 
+distanta 0 si initializarea unui vector de noduri precedente 
+si un vector de noduri vizitate. Apoi, intr-un ciclu, se selecteaza 
+nodul nevizitat cu cea mai mica distanta si se actualizeaza distantele
+vecinilor nevizitati daca se gaseste o cale mai scurta prin nodul 
+curent. 
+	Aceste etape se repeta pana cand toate nodurile sunt vizitate sau
+nu mai exista noduri nevizitate cu distanta infinita. Apoi, se 
+construieste calea optima de la nodul destinatie
+la nodul sursa prin parcurgerea unui vector cu indecsi nodurilor 
+precedente, adaugand numele nodurilor intr-un vector.
+Numele nodurilor din cale sunt apoi inversate pentru a obtine
+ordinea corecta. 
+	
+	-calculate_values:
 
+	Sunt calculate datele ce trebuie scrie in output, pornind de la numele
+nodurilor din calea gasita. Acestea sunt: adancimea minima a unui nod
+(capacitatea maxima a corabiei), distanta totala de la insula la corabie,
+si nr de drumuri ce trebuie efectuate.
+	
+	
+	 
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+										
+																					
+																					

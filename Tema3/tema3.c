@@ -2,6 +2,7 @@
 #include "task2.h"
 
 void free_graph(Graph my_graph);
+void free_digraph(Digraph my_graph);
 
 int main(int argc, char **argv)
 {
@@ -9,10 +10,6 @@ int main(int argc, char **argv)
     int nr_nodes = 0;
     int nr_edges = 0;
     int i;
-
-    // DEBUG MODE
-    // argc = 2;
-    // argv[1] = "2";
 
     if (argc == 1)
     {
@@ -48,8 +45,10 @@ int main(int argc, char **argv)
             fprintf(stderr, "Error when reading nr of edges!\n");
             exit(1);
         }
-        char(*names1)[MAX_STRLEN] = (char(*)[MAX_STRLEN])malloc(nr_edges * sizeof(char[MAX_STRLEN]));
-        char(*names2)[MAX_STRLEN] = (char(*)[MAX_STRLEN])malloc(nr_edges * sizeof(char[MAX_STRLEN]));
+        char(*names1)[MAX_STRLEN] = (char(*)[MAX_STRLEN])
+            malloc(nr_edges * sizeof(char[MAX_STRLEN]));
+        char(*names2)[MAX_STRLEN] = (char(*)[MAX_STRLEN])
+            malloc(nr_edges * sizeof(char[MAX_STRLEN]));
         int *costs = (int *)malloc(nr_edges * sizeof(int));
 
         read_edges(&in, names1, names2, costs, nr_edges);
@@ -110,21 +109,30 @@ int main(int argc, char **argv)
             fprintf(stderr, "Error when reading nr of edges!\n");
             exit(1);
         }
-        char(*names1)[MAX_STRLEN] = (char(*)[MAX_STRLEN])malloc(nr_edges * sizeof(char[MAX_STRLEN]));
-        char(*names2)[MAX_STRLEN] = (char(*)[MAX_STRLEN])malloc(nr_edges * sizeof(char[MAX_STRLEN]));
+        char(*names1)[MAX_STRLEN] = (char(*)[MAX_STRLEN])
+            malloc(nr_edges * sizeof(char[MAX_STRLEN]));
+        char(*names2)[MAX_STRLEN] = (char(*)[MAX_STRLEN])
+            malloc(nr_edges * sizeof(char[MAX_STRLEN]));
         int *distances = (int *)malloc(nr_edges * sizeof(int));
         int *depths = (int *)malloc(nr_nodes * sizeof(int));
         int treasure_weight;
-        char(*nodes)[MAX_STRLEN] = (char(*)[MAX_STRLEN])malloc(nr_nodes * sizeof(char[MAX_STRLEN]));
+        char(*nodes)[MAX_STRLEN] = (char(*)[MAX_STRLEN])
+            malloc(nr_nodes * sizeof(char[MAX_STRLEN]));
 
         treasure_weight = read_map(&in, names1, names2, distances, depths,
                                    nodes, nr_nodes, nr_edges);
-        graph = init_digraph(&graph, nr_nodes, nr_edges, treasure_weight, nodes);
+        graph = init_digraph(&graph, nr_nodes,
+                             nr_edges, treasure_weight, nodes);
         graph = build_digraph(graph, names1, names2, distances, depths);
 
-        print_digraph(graph);
+        free(names1);
+        free(names2);
+        free(distances);
+        free(depths);
+        free(nodes);
 
-        char(*path)[MAX_STRLEN] = (char(*)[MAX_STRLEN])malloc(nr_nodes * sizeof(char[MAX_STRLEN]));
+        char(*path)[MAX_STRLEN] = (char(*)[MAX_STRLEN])
+            malloc(nr_nodes * sizeof(char[MAX_STRLEN]));
         int path_length;
         bool found;
         found = Dijkstra(graph, "Corabie", "Insula", path, &path_length);
@@ -150,7 +158,8 @@ int main(int argc, char **argv)
                 int min_depth = INFINITY;
                 int total_distance = 0;
                 int nr_passes = 0;
-                calculate_values(graph, path, path_length, &min_depth, &total_distance, &nr_passes);
+                calculate_values(graph, path, path_length,
+                                 &min_depth, &total_distance, &nr_passes);
 
                 for (i = 0; i < path_length; ++i)
                 {
@@ -161,6 +170,8 @@ int main(int argc, char **argv)
                 fprintf(out, "\n%d\n", nr_passes);
             }
         }
+        free(path);
+        free_digraph(graph);
     }
     else
     {
@@ -182,6 +193,21 @@ void free_graph(Graph my_graph)
         while (current != NULL)
         {
             Node *next = current->next;
+            free(current);
+            current = next;
+        }
+    }
+    free(my_graph.lists);
+}
+
+void free_digraph(Digraph my_graph)
+{
+    for (int i = 0; i < my_graph.nr_nodes; ++i)
+    {
+        dirNode *current = my_graph.lists[i];
+        while (current != NULL)
+        {
+            dirNode *next = current->next;
             free(current);
             current = next;
         }
