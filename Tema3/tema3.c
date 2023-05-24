@@ -1,4 +1,5 @@
 #include "task1.h"
+#include "task2.h"
 
 void free_graph(Graph my_graph);
 
@@ -10,8 +11,8 @@ int main(int argc, char **argv)
     int i;
 
     // DEBUG MODE
-    argc = 2;
-    argv[1] = "1";
+    // argc = 2;
+    // argv[1] = "2";
 
     if (argc == 1)
     {
@@ -98,7 +99,68 @@ int main(int argc, char **argv)
     }
     else if (strcmp(argv[1], "2") == 0)
     {
-        // Cerinta 2
+        Digraph graph;
+        if (fscanf(in, "%d", &nr_nodes) != 1)
+        {
+            fprintf(stderr, "Error when reading nr of nodes!\n");
+            exit(1);
+        }
+        if (fscanf(in, "%d", &nr_edges) != 1)
+        {
+            fprintf(stderr, "Error when reading nr of edges!\n");
+            exit(1);
+        }
+        char(*names1)[MAX_STRLEN] = (char(*)[MAX_STRLEN])malloc(nr_edges * sizeof(char[MAX_STRLEN]));
+        char(*names2)[MAX_STRLEN] = (char(*)[MAX_STRLEN])malloc(nr_edges * sizeof(char[MAX_STRLEN]));
+        int *distances = (int *)malloc(nr_edges * sizeof(int));
+        int *depths = (int *)malloc(nr_nodes * sizeof(int));
+        int treasure_weight;
+        char(*nodes)[MAX_STRLEN] = (char(*)[MAX_STRLEN])malloc(nr_nodes * sizeof(char[MAX_STRLEN]));
+
+        treasure_weight = read_map(&in, names1, names2, distances, depths,
+                                   nodes, nr_nodes, nr_edges);
+        graph = init_digraph(&graph, nr_nodes, nr_edges, treasure_weight, nodes);
+        graph = build_digraph(graph, names1, names2, distances, depths);
+
+        print_digraph(graph);
+
+        char(*path)[MAX_STRLEN] = (char(*)[MAX_STRLEN])malloc(nr_nodes * sizeof(char[MAX_STRLEN]));
+        int path_length;
+        bool found;
+        found = Dijkstra(graph, "Corabie", "Insula", path, &path_length);
+        if (found == false)
+        {
+            fprintf(out, "Echipajul nu poate ajunge la insula\n");
+        }
+        else
+        {
+            found = Dijkstra(graph, "Insula", "Corabie", path, &path_length);
+            if (found == false)
+            {
+                fprintf(out, "Echipajul nu poate transporta comoara inapoi la corabie\n");
+            }
+            else
+            {
+                printf("Path: ");
+                for (i = 0; i < path_length; ++i)
+                {
+                    printf("%s ", path[i]);
+                }
+
+                int min_depth = INFINITY;
+                int total_distance = 0;
+                int nr_passes = 0;
+                calculate_values(graph, path, path_length, &min_depth, &total_distance, &nr_passes);
+
+                for (i = 0; i < path_length; ++i)
+                {
+                    fprintf(out, "%s ", path[i]);
+                }
+                fprintf(out, "\n%d", total_distance);
+                fprintf(out, "\n%d", min_depth);
+                fprintf(out, "\n%d\n", nr_passes);
+            }
+        }
     }
     else
     {
