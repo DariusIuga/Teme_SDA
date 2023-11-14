@@ -1,8 +1,8 @@
-***Assignment 2 - Image Compression using Trees***
+# Assignment 2 - Quadtree-based immage compression
 
 On the local checker, I obtained a score of 54 out of 80 on tests and a bonus of 8 points on Valgrind.
 
-**Implementation Description:**
+## Implementation Description:
 
 1. **Task 1:** The values written in the file containing the compression tree statistics are stored in an output structure.
 
